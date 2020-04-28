@@ -1,0 +1,19 @@
+# Ignore all
+*
+
+# Unignore all with extensions
+!*.*
+
+# Unignore all dirs
+!*/
+
+#Object files
+*.o
+
+#Execution files
+*.tmp
+*.tk
+*.data
+
+#Hidden files/dirs
+.*
