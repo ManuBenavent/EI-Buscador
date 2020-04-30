@@ -22,16 +22,19 @@ class Buscador: public IndexadorHash {
     friend ostream& operator<<(ostream& s, const Buscador& p);
 private:
     Buscador();
-    /*Contendrá los resultados de la última búsqueda realizada en orden
-    decreciente según la relevancia sobre la pregunta.*/
+    
     //priority_queue< ResultadoRI > docsOrdenados;
     set<ResultadoRI> docsOrdenados;
+
     // 0: DFR, 1: BM25
     int formSimilitud;
+
     // Constante del modelo DFR
     double c;
+
     // Constante modelo BM25
     double k1;
+
     // Constante modelo BM25
     double b;
 public:
@@ -49,10 +52,8 @@ public:
     // TODO
     bool Buscar(const string& dirPreguntas, const int& numDocumentos, const int& numPregInicio);
 
-    // TODO
     void ImprimirResultadoBusqueda(const int& numDocumentos = 99999) const;
 
-    // TODO
     bool ImprimirResultadoBusqueda(const int& numDocumentos, const string& nomFichero) const;
 
     int DevolverFormulaSimilitud() { return formSimilitud; }

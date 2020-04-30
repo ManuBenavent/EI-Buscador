@@ -1,7 +1,9 @@
 #include "buscador.h"
 
 /*
+* ----------------------------------------------------------------------------------------------------------------
 * Clase ResultadoRI
+* ----------------------------------------------------------------------------------------------------------------
 */
 ResultadoRI::ResultadoRI(const double& kvSimilitud, const long int& kidDoc, const int& np){
     vSimilitud = kvSimilitud;
@@ -22,7 +24,9 @@ ostream& operator<< (ostream& os, const ResultadoRI &res){
 }
 
 /*
+* ----------------------------------------------------------------------------------------------------------------
 * Clase Buscador
+* ----------------------------------------------------------------------------------------------------------------
 */
 Buscador::Buscador():IndexadorHash("", "", false, false, "", 0, false, false){
     this->formSimilitud = 0;
@@ -57,6 +61,7 @@ Buscador& Buscador::operator=(const Buscador& p){
     return (*this);
 }
 
+// TODO
 bool Buscador::Buscar(const int& numDocumentos){
 /*
 Devuelve true si en IndexadorHash.pregunta hay indexada una pregunta
@@ -76,6 +81,7 @@ inicializará a 99999)
 */
 }
 
+// TODO
 bool Buscador::Buscar(const string& dirPreguntas, const int& numDocumentos, const int& numPregInicio){
     /*
     Realizará la búsqueda entre el número de pregunta “numPregInicio” y
