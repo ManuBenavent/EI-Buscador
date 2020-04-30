@@ -41,7 +41,7 @@ const bool& minuscSinAcentos, const string& dirIndice, const int& tStemmer, cons
 
 IndexadorHash::IndexadorHash(const string& directorioIndexacion){
     if(!RecuperarIndexacion(directorioIndexacion)){
-        throw "ERROR: No se pudo recuperar la indexacion";
+        cerr << "ERROR: No se pudo recuperar la indexacion";
     }
 }
 

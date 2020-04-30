@@ -21,9 +21,9 @@ class Buscador: public IndexadorHash {
 private:
     Buscador();
     /*Contendrá los resultados de la última búsqueda realizada en orden
-    decreciente según la relevancia sobre la pregunta. El tipo “priority_queue” 
-    podrá modificarse por cuestiones de eficiencia. */
+    decreciente según la relevancia sobre la pregunta.*/
     priority_queue< ResultadoRI > docsOrdenados;
+    //set<ResultadoRI> docsOrdenados;
     // 0: DFR, 1: BM25
     int formSimilitud;
     // Constante del modelo DFR
@@ -33,7 +33,37 @@ private:
     // Constante modelo BM25
     double b;
 public:
+    Buscador(const string& directorioIndexacion, const int& f);
 
+    Buscador(const Buscador &);
+
+    ~Buscador(){}
+
+    Buscador& operator=(const Buscador&);
+
+    // TODO
+    bool Buscar(const int& numDocumentos = 99999);
+
+    // TODO
+    bool Buscar(const string& dirPreguntas, const int& numDocumentos, const int& numPregInicio);
+
+    // TODO
+    void ImprimirResultadoBusqueda(const int& numDocumentos = 99999) const;
+
+    // TODO
+    bool ImprimirResultadoBusqueda(const int& numDocumentos, const string& nomFichero) const;
+
+    int DevolverFormulaSimilitud() { return formSimilitud; }
+
+    bool CambiarFormulaSimilitud(const int& f);
+
+    void CambiarParametrosDFR(const double& kc) { c=kc; }
+
+    double DevolverParametrosDFR() const { return c; }
+
+    void CambiarParametrosBM35(const double& kk1, const double& kb) { k1 = kk1; b = kb; }
+
+    void DevolverParametrosBM35(double& kk1, double& kb) const { kk1 = k1; kb = b; }
 };
 
 #endif
