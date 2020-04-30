@@ -2,8 +2,10 @@
 #define _BUSCADOR_H_
 #include "indexadorHash.h"
 #include <queue>
+#include <set>
 
 class ResultadoRI {
+    friend class Buscador;
     friend ostream& operator<<(ostream& s, const ResultadoRI& res);
 private:
     double vSimilitud;
@@ -22,8 +24,8 @@ private:
     Buscador();
     /*Contendrá los resultados de la última búsqueda realizada en orden
     decreciente según la relevancia sobre la pregunta.*/
-    priority_queue< ResultadoRI > docsOrdenados;
-    //set<ResultadoRI> docsOrdenados;
+    //priority_queue< ResultadoRI > docsOrdenados;
+    set<ResultadoRI> docsOrdenados;
     // 0: DFR, 1: BM25
     int formSimilitud;
     // Constante del modelo DFR

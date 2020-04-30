@@ -97,16 +97,33 @@ documento, pregunta y término en el que se ha quedado.
     */
 }
 
-// TODO: mirar PDF
 void Buscador::ImprimirResultadoBusqueda(const int& numDocumentos) const{
-
+    string pregunta="";
+    this->DevuelvePregunta(pregunta);
+    int i = numDocumentos;
+    for(set<ResultadoRI>::const_iterator it = docsOrdenados.begin(); it != docsOrdenados.end() && i > 0; it++){
+        cout << (*it).numPregunta << " " << (this->formSimilitud==0?"DFR":"BM25") << " " << (*it).idDoc << " " << (numDocumentos - i) << " " 
+            << (*it).vSimilitud << " " << ((((*it).numPregunta)==0)?pregunta:"ConjuntoDePreguntas") << endl;
+        i--;
+    }
 }
 
-/*Lo mismo que “ImprimirResultadoBusqueda()” pero guardando la salida
-en el fichero de nombre “nombreFichero”
-Devolverá false si no consigue crear correctamente el archivo*/
 bool Buscador::ImprimirResultadoBusqueda(const int& numDocumentos, const string& nomFichero) const{
-
+    string pregunta = "";
+    this->DevuelvePregunta(pregunta);
+    int i = numDocumentos;
+    ofstream file;
+    file.open(nomFichero.c_str());
+    if(!file){
+        cerr << "ERROR: No se pudo abrir el archivo nomFichero" << endl;
+        return false;
+    }
+    for(set<ResultadoRI>::const_iterator it = docsOrdenados.begin(); it != docsOrdenados.end() && i > 0; it++){
+        file << (*it).numPregunta << " " << (this->formSimilitud==0?"DFR":"BM25") << " " << (*it).idDoc << " " << (numDocumentos - i) << " " 
+            << (*it).vSimilitud << " " << ((((*it).numPregunta)==0)?pregunta:"ConjuntoDePreguntas") << "\n";
+    }
+    file.close();
+    return true;
 }
 
 bool Buscador::CambiarFormulaSimilitud(const int& f){
