@@ -63,6 +63,21 @@ Buscador& Buscador::operator=(const Buscador& p){
 
 // TODO
 bool Buscador::Buscar(const int& numDocumentos){
+    InformacionTerminoPregunta info;
+    if(!HayPregunta() ){ // Devuelve !indicePregunta.empty();
+        return false;
+    }
+
+    docsOrdenados.clear();
+    // Comprobar e insertar la puntuación para cada uno de los documentos, recorremos el indice para los terminos almacenados en la pregunta (devuelve->optimizar)
+    // Para cada termino calcular el peso de cada uno de los documentos e insertar/actualizar een formSimilitud
+    // Cuestiones de eficiencia: usar priority_queue/set
+    // Guardar solo los primeros numDocumentos:
+    /*
+        Guardar todos y luego recortar
+        Aplicar algun tipo de cota que me indique que debo descartar los documentos si o si?
+    */
+    return true;
 /*
 Devuelve true si en IndexadorHash.pregunta hay indexada una pregunta
 no vacía con algún término con contenido, y si sobre esa pregunta se
