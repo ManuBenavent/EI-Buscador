@@ -3,6 +3,8 @@
 #include "indexadorHash.h"
 #include <queue>
 #include <set>
+#include <map>
+#include <math.h>
 
 class ResultadoRI {
     friend class Buscador;
@@ -12,7 +14,10 @@ private:
     long int idDoc;
     int numPregunta;
 public:
+    ResultadoRI(){}
     ResultadoRI(const double& kvSimilitud, const long int& kidDoc, const int& np);
+    ResultadoRI& operator=(const ResultadoRI& p){vSimilitud = p.vSimilitud; idDoc = p.idDoc; numPregunta = p.numPregunta; return *this;}
+    ResultadoRI(const ResultadoRI& p){vSimilitud = p.vSimilitud; idDoc = p.idDoc; numPregunta = p.numPregunta;}
     double Vsimilitud() const { return vSimilitud; }
     long int IdDoc() const { return idDoc; }
     bool operator< (const ResultadoRI& lhs) const;
@@ -66,7 +71,7 @@ public:
 
     void CambiarParametrosBM35(const double& kk1, const double& kb) { k1 = kk1; b = kb; }
 
-    void DevolverParametrosBM35(double& kk1, double& kb) const { kk1 = k1; kb = b; }
+    void DevolverParametrosBM25(double& kk1, double& kb) const { kk1 = k1; kb = b; }
 };
 
 #endif

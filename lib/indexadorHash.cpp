@@ -43,6 +43,16 @@ IndexadorHash::IndexadorHash(const string& directorioIndexacion){
     if(!RecuperarIndexacion(directorioIndexacion)){
         cerr << "ERROR: No se pudo recuperar la indexacion";
     }
+    long int res = 0;
+    string::size_type pos; 
+    for(auto it = indiceDocs.begin(); it != indiceDocs.end(); it++){
+        pos = it->first.find_last_of('/');
+        pos = pos==string::npos?0:pos + 1;
+        nombreFicheroPuro.push_back(it->first.substr(pos,it->first.find('.')-pos));
+        PalSinParadaDocs.push_back(it->second.getNumPalNoStop());
+        res += it->second.getNumPalNoStop();
+    }
+    MediaDocsSinParada = res / PalSinParadaDocs.size();
 }
 
 IndexadorHash::IndexadorHash(const IndexadorHash& i){
@@ -687,7 +697,7 @@ void IndexadorHash::ImprimirIndexacion() const {
 bool IndexadorHash::IndexarPregunta(const string& preg){
     pregunta = preg;
     indicePregunta.clear();
-    infPregunta.~InformacionPregunta();
+    infPregunta = InformacionPregunta();
 
     list<string> tokens;
     stemmerPorter stemmer;
@@ -699,11 +709,12 @@ bool IndexadorHash::IndexarPregunta(const string& preg){
         if(stopWords.find(*it) == stopWords.end()){
             stemmer.stemmer(*it, tipoStemmer);
             infPregunta.addPalNoStop();
-            if(indicePregunta.find(*it) != indicePregunta.end()){
+            unordered_map<string, InformacionTerminoPregunta>::iterator termino = indicePregunta.find(*it);
+            if(termino != indicePregunta.end()){
                 // Existe actualizar InformacionTerminoPregunta
-                indicePregunta[*it].add_ft();
+                termino->second.add_ft();
                 if(almacenarPosTerm)
-                    indicePregunta[*it].addPosTermItem(infPregunta.getNumTotalPal()-1);
+                    termino->second.addPosTermItem(infPregunta.getNumTotalPal()-1);
             }
             else{
                 // No existe crear nuevo InformacionTerminoPregunta
@@ -712,6 +723,14 @@ bool IndexadorHash::IndexarPregunta(const string& preg){
                 infTerm.add_ft();
                 if(almacenarPosTerm)
                     infTerm.addPosTermItem(infPregunta.getNumTotalPal()-1);
+
+                // Si el termino esta indexado almaceno el IDF
+                auto infoTermino = indice.find(*it);
+                if(infoTermino != indice.end()){
+                    int nqi = infoTermino->second.GetNumDocs();
+                    infTerm.setIDF( log2( (informacionColeccionDocs.getNumDocs() - nqi + 0.5) / (nqi + 0.5) ) );
+                }
+                
                 indicePregunta[*it] = infTerm;
             }
         }

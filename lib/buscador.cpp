@@ -63,37 +63,44 @@ Buscador& Buscador::operator=(const Buscador& p){
 
 // TODO
 bool Buscador::Buscar(const int& numDocumentos){
-    InformacionTerminoPregunta info;
-    if(!HayPregunta() ){ // Devuelve !indicePregunta.empty();
+    if(indicePregunta.empty()){ // No hay ninguna pregunta indexada con terminos validos
         return false;
     }
-
+    InformacionPregunta infPreg;
+    DevuelvePregunta(infPreg);
     docsOrdenados.clear();
-    // Comprobar e insertar la puntuación para cada uno de los documentos, recorremos el indice para los terminos almacenados en la pregunta (devuelve->optimizar)
-    // Para cada termino calcular el peso de cada uno de los documentos e insertar/actualizar een formSimilitud
-    // Cuestiones de eficiencia: usar priority_queue/set
-    // Guardar solo los primeros numDocumentos:
-    /*
-        Guardar todos y luego recortar
-        Aplicar algun tipo de cota que me indique que debo descartar los documentos si o si?
-    */
+    int d;
+    double avgd;
+    map<long int, ResultadoRI> mapa;
+    for(unordered_map<string, InformacionTerminoPregunta>::const_iterator it = indicePregunta.begin(); it != indicePregunta.end(); it++){
+        InformacionTermino inf;
+        Devuelve(it->first, inf);
+        auto l_docs = inf.getMap();
+        for(auto term = l_docs.begin(); term != l_docs.end(); term++){
+            double res;
+            // TODO comprobar logs de negativos
+            /*if(this->formSimilitud == 0){
+                double ftd = term->second.get_ft() * log2(1 + ( (c * getMediaDocsSinparada()) /getDocSinParada(term->first)) );
+                double lambdat = inf.get_ftc()/NumDocsIndexados();
+                res = (it->second.get_ft()/infPreg.getNumTotalPalSinParada()) * ((log2(1 + lambdat) + ftd*log2((1+lambdat)/lambdat)) * ((inf.get_ftc() + 1) / (l_docs.size()*(ftd + 1))) );
+            }
+            else*/
+                cout << it->first << ":\t" << it->second.getIDF() << endl;
+                res = it->second.getIDF()*((term->second.get_ft()*(k1 + 1)) / (term->second.get_ft() + k1*(b*(getDocSinParada(term->first)/getMediaDocsSinparada()))));
+            auto pos = mapa.find(term->first);
+            if(pos != mapa.end())
+                pos->second.vSimilitud+=res;
+            else
+                mapa[term->first] = ResultadoRI(res, term->first, 0);
+        }
+    }
+    int i = 0;
+    // TODO insertar el ultimo primero es mas eficiente?
+    for(auto it = mapa.begin(); it != mapa.end() && i < numDocumentos; it++){
+        docsOrdenados.insert(it->second);
+        i++;
+    }
     return true;
-/*
-Devuelve true si en IndexadorHash.pregunta hay indexada una pregunta
-no vacía con algún término con contenido, y si sobre esa pregunta se
-finaliza la búsqueda correctamente con la fórmula de similitud indicada
-en la variable privada “formSimilitud”.
-Por ejemplo, devuelve falso si no finaliza la búsqueda por falta de
-memoria, mostrando el mensaje de error correspondiente, e indicando el
-documento y término en el que se ha quedado.
-// Se guardarán los primeros “numDocumentos” documentos más relevantes
-en la variable privada “docsOrdenados” en orden decreciente según la
-relevancia sobre la pregunta (se vaciará previamente el contenido de
-esta variable antes de realizar la búsqueda). Como número de pregunta en
-“ResultadoRI.numPregunta” se almacenará el valor 0. En caso de que no se
-introduzca el parámetro “numDocumentos”, entonces dicho parámetro se
-inicializará a 99999)
-*/
 }
 
 // TODO
@@ -123,7 +130,7 @@ void Buscador::ImprimirResultadoBusqueda(const int& numDocumentos) const{
     this->DevuelvePregunta(pregunta);
     int i = numDocumentos;
     for(set<ResultadoRI>::const_iterator it = docsOrdenados.begin(); it != docsOrdenados.end() && i > 0; it++){
-        cout << (*it).numPregunta << " " << (this->formSimilitud==0?"DFR":"BM25") << " " << (*it).idDoc << " " << (numDocumentos - i) << " " 
+        cout << (*it).numPregunta << " " << (this->formSimilitud==0?"DFR":"BM25") << " " << getNombreFichero((*it).idDoc) << " " << (numDocumentos - i) << " " 
             << (*it).vSimilitud << " " << ((((*it).numPregunta)==0)?pregunta:"ConjuntoDePreguntas") << endl;
         i--;
     }
@@ -140,7 +147,7 @@ bool Buscador::ImprimirResultadoBusqueda(const int& numDocumentos, const string&
         return false;
     }
     for(set<ResultadoRI>::const_iterator it = docsOrdenados.begin(); it != docsOrdenados.end() && i > 0; it++){
-        file << (*it).numPregunta << " " << (this->formSimilitud==0?"DFR":"BM25") << " " << (*it).idDoc << " " << (numDocumentos - i) << " " 
+        file << (*it).numPregunta << " " << (this->formSimilitud==0?"DFR":"BM25") << " " << getNombreFichero((*it).idDoc) << " " << (numDocumentos - i) << " " 
             << (*it).vSimilitud << " " << ((((*it).numPregunta)==0)?pregunta:"ConjuntoDePreguntas") << "\n";
     }
     file.close();

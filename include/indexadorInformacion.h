@@ -168,6 +168,7 @@ class InformacionTerminoPregunta {
     friend ostream& operator<<(ostream& s, const InformacionTerminoPregunta& p);
 private:
     int ft;
+    float IDF;
     list<int> posTerm;
 public:
     // Clase
@@ -180,6 +181,10 @@ public:
     void addPosTermItem(int x) { posTerm.push_back(x); }
     // Setter
     void set_ft (int x) { ft=x; }
+    void setIDF (const float & x)  {IDF = x;}
+    // Getter
+    int get_ft() const { return ft; }
+    float getIDF() const { return IDF; }
     // Otros
     string ToFile() const;
 };
@@ -206,6 +211,7 @@ public:
     void addPalDif() { numTotalPalDiferentes++; }
     // Getters
     int getNumTotalPal() { return numTotalPal; }
+    int getNumTotalPalSinParada() { return numTotalPalSinParada; }
     // Otros
     string ToFile() const;
 };

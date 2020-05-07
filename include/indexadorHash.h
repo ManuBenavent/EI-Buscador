@@ -3,8 +3,10 @@
 #include <iostream>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 #include <sys/stat.h>
 #include <time.h>
+#include <math.h>
 #include "indexadorInformacion.h"
 #include "tokenizador.h"
 #include "stemmer.h"
@@ -42,7 +44,7 @@ private:
 
     string pregunta;
 
-    unordered_map<string, InformacionTerminoPregunta> indicePregunta;
+    
 
     InformacionPregunta infPregunta;
 
@@ -67,7 +69,25 @@ private:
     void DesfragmentarArchivos();
 
     void DevuelveDoc(streampos, InfDoc &infDoc) const;
+
+    // Nuevo
+
+    vector<long int> PalSinParadaDocs;
+
+    double MediaDocsSinParada;
+
+    vector<string> nombreFicheroPuro;
+
 public:   
+
+    string getNombreFichero(int x) const {return nombreFicheroPuro[x-1];}
+
+    double getMediaDocsSinparada() const { return MediaDocsSinParada; }
+
+    long int getDocSinParada(int x) const { return PalSinParadaDocs[x]; }
+
+    unordered_map<string, InformacionTerminoPregunta> indicePregunta; // TODO devolver a parte privada
+
     IndexadorHash(const string& ficheroStopWords, const string& delimitadores, const bool& detectComp, const bool& minuscSinAcentos, 
                 const string& dirIndice, const int& tStemmer, const bool& almEnDisco, const bool& almPosTerm);
     
@@ -120,6 +140,8 @@ public:
     bool Inserta(string word, const InformacionTermino& inf);
     
     int NumPalIndexadas() const { return almacenarEnDisco?indiceMinimo.size():indice.size(); }
+
+    int NumDocsIndexados() const { return indiceDocs.size(); }
     
     string DevolverFichPalParada () const { return this->ficheroStopWords; }
     

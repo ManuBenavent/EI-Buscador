@@ -265,21 +265,24 @@ ostream& operator<<(ostream& s, const InfColeccionDocs& p){
 **/
 InformacionTerminoPregunta::InformacionTerminoPregunta(){
     ft = 0;
+    IDF = 0;
 }
 
 InformacionTerminoPregunta::InformacionTerminoPregunta(const InformacionTerminoPregunta &p){
     ft = p.ft;
     posTerm = p.posTerm;
+    IDF = p.IDF;
 }
 
 InformacionTerminoPregunta::~InformacionTerminoPregunta(){
     ft = 0;
-    posTerm.clear();
+    IDF = 0;
 }
 
 InformacionTerminoPregunta & InformacionTerminoPregunta::operator=(const InformacionTerminoPregunta &p){
     ft = p.ft;
     posTerm = p.posTerm;
+    IDF = p.IDF;
     return (*this);
 }
 

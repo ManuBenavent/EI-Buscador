@@ -5,5 +5,5 @@
 using namespace std;
 
 int main() {
-  //Buscador b("prueba", 1);
+  Buscador b("prueba", 1);
 }
