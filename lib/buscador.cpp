@@ -80,8 +80,9 @@ bool Buscador::Buscar(const int& numDocumentos){
             // TODO comprobar logs de negativos
             if(this->formSimilitud == 0){
                 double ftd = term->second.get_ft() * log2(1 + ( (c * getMediaDocsSinparada()) /PalSinParadaDocs[term->first-1]) );
-                double lambdat = inf.get_ftc()/NumDocsIndexados();
-                res = (it->second.get_ft()/infPreg.getNumTotalPalSinParada()) * ((log2(1 + lambdat) + ftd*log2((1+lambdat)/lambdat)) * ((inf.get_ftc() + 1) / (l_docs.size()*(ftd + 1))) );
+                double lambdat = (double)inf.get_ftc()/NumDocsIndexados();
+                double aux = (log2(1 + lambdat) + ftd*log2((1+lambdat)/lambdat)) * ((inf.get_ftc() + 1) / (l_docs.size()*(ftd + 1)));
+                res = ((double)it->second.get_ft()/infPreg.getNumTotalPalSinParada()) * aux;
             }
             else
                 res = (it->second.getIDF()*term->second.get_ft()*(k1 + 1)) / (term->second.get_ft() + (k1 * (1 - b + ((b*PalSinParadaDocs[term->first-1])/getMediaDocsSinparada()))));
