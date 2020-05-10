@@ -69,8 +69,7 @@ bool Buscador::Buscar(const int& numDocumentos){
     InformacionPregunta infPreg;
     DevuelvePregunta(infPreg);
     docsOrdenados.clear();
-    int d;
-    double avgd;
+
     map<long int, ResultadoRI> mapa;
     for(unordered_map<string, InformacionTerminoPregunta>::const_iterator it = indicePregunta.begin(); it != indicePregunta.end(); it++){
         InformacionTermino inf;
@@ -79,15 +78,15 @@ bool Buscador::Buscar(const int& numDocumentos){
         for(auto term = l_docs.begin(); term != l_docs.end(); term++){
             double res;
             // TODO comprobar logs de negativos
-            /*if(this->formSimilitud == 0){
-                double ftd = term->second.get_ft() * log2(1 + ( (c * getMediaDocsSinparada()) /getDocSinParada(term->first)) );
+            if(this->formSimilitud == 0){
+                double ftd = term->second.get_ft() * log2(1 + ( (c * getMediaDocsSinparada()) /PalSinParadaDocs[term->first-1]) );
                 double lambdat = inf.get_ftc()/NumDocsIndexados();
                 res = (it->second.get_ft()/infPreg.getNumTotalPalSinParada()) * ((log2(1 + lambdat) + ftd*log2((1+lambdat)/lambdat)) * ((inf.get_ftc() + 1) / (l_docs.size()*(ftd + 1))) );
             }
-            else*/
-                cout << it->first << ":\t" << it->second.getIDF() << endl;
-                res = it->second.getIDF()*((term->second.get_ft()*(k1 + 1)) / (term->second.get_ft() + k1*(b*(getDocSinParada(term->first)/getMediaDocsSinparada()))));
-            auto pos = mapa.find(term->first);
+            else
+                res = (it->second.getIDF()*term->second.get_ft()*(k1 + 1)) / (term->second.get_ft() + (k1 * (1 - b + ((b*PalSinParadaDocs[term->first-1])/getMediaDocsSinparada()))));
+            
+            map<long int, ResultadoRI>::iterator pos = mapa.find(term->first);
             if(pos != mapa.end())
                 pos->second.vSimilitud+=res;
             else

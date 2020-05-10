@@ -70,6 +70,10 @@ private:
 
     void DevuelveDoc(streampos, InfDoc &infDoc) const;
 
+    
+
+public:   
+
     // Nuevo
 
     vector<long int> PalSinParadaDocs;
@@ -78,13 +82,11 @@ private:
 
     vector<string> nombreFicheroPuro;
 
-public:   
-
-    string getNombreFichero(int x) const {return nombreFicheroPuro[x-1];}
+    string getNombreFichero(const int& x) const {return nombreFicheroPuro[x-1];}
 
     double getMediaDocsSinparada() const { return MediaDocsSinParada; }
 
-    long int getDocSinParada(int x) const { return PalSinParadaDocs[x]; }
+    //long int getDocSinParada(const int& x) const { return PalSinParadaDocs[x-1]; }
 
     unordered_map<string, InformacionTerminoPregunta> indicePregunta; // TODO devolver a parte privada
 

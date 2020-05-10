@@ -43,7 +43,7 @@ IndexadorHash::IndexadorHash(const string& directorioIndexacion){
     if(!RecuperarIndexacion(directorioIndexacion)){
         cerr << "ERROR: No se pudo recuperar la indexacion";
     }
-    long int res = 0;
+    double res = 0;
     string::size_type pos; 
     for(auto it = indiceDocs.begin(); it != indiceDocs.end(); it++){
         pos = it->first.find_last_of('/');
