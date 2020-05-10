@@ -40,45 +40,7 @@ Buscador& Buscador::operator=(const Buscador& p){
 
 // TODO
 bool Buscador::Buscar(const int& numDocumentos){
-    if(indicePregunta.empty()){ // No hay ninguna pregunta indexada con terminos validos
-        return false;
-    }
-    InformacionPregunta infPreg;
-    DevuelvePregunta(infPreg);
-    docsOrdenados.clear();
-
-    map<long int, ResultadoRI> mapa;
-    for(unordered_map<string, InformacionTerminoPregunta>::const_iterator it = indicePregunta.begin(); it != indicePregunta.end(); it++){
-        InformacionTermino inf;
-        Devuelve(it->first, inf);
-        auto l_docs = inf.getMap();
-
-        for(auto term = l_docs.begin(); term != l_docs.end(); term++){
-            double res;
-            // TODO comprobar logs de negativos
-            if(this->formSimilitud == 0){
-                double ftd = term->second.get_ft() * log2(1 + ( (c * getMediaDocsSinparada()) /PalSinParadaDocs[term->first-1]) );
-                double lambdat = (double)inf.get_ftc()/NumDocsIndexados();
-                double aux = (log2(1 + lambdat) + ftd*log2((1+lambdat)/lambdat)) * ((inf.get_ftc() + 1) / (l_docs.size()*(ftd + 1)));
-                res = ((double)it->second.get_ft()/infPreg.getNumTotalPalSinParada()) * aux;
-            }
-            else
-                res = (it->second.getIDF()*term->second.get_ft()*(k1 + 1)) / (term->second.get_ft() + (k1 * (1 - b + ((b*PalSinParadaDocs[term->first-1])/getMediaDocsSinparada()))));
-            
-            map<long int, ResultadoRI>::iterator pos = mapa.find(term->first);
-            if(pos != mapa.end())
-                pos->second.vSimilitud+=res;
-            else
-                mapa[term->first] = ResultadoRI(res, term->first, 0);
-        }
-    }
-    int i = 0;
-    // TODO insertar el ultimo primero es mas eficiente?
-    for(auto it = mapa.begin(); it != mapa.end() && i < numDocumentos; it++){
-        docsOrdenados.insert(it->second);
-        i++;
-    }
-    return true;
+    return BuscarIndex(numDocumentos, docsOrdenados, c, formSimilitud, b, k1);
 }
 
 // TODO

@@ -183,8 +183,8 @@ public:
     void set_ft (int x) { ft=x; }
     void setIDF (const float & x)  {IDF = x;}
     // Getter
-    int get_ft() const const { return ft; }
-    float getIDF() const const { return IDF; }
+    int get_ft() const { return ft; }
+    float getIDF() const { return IDF; }
     // Otros
     string ToFile() const;
 };

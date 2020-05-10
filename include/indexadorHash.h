@@ -183,6 +183,8 @@ public:
     
     bool ListarDocs(const string& nomDoc) const;
 
-    bool Buscar(const int& numDocs, set<ResultadoRI>& docsOrdenados, const int& c, const int& formSimilitud, const int& b, const int& k1) const;
+    bool BuscarIndex(const int& numDocs, set<ResultadoRI>& docsOrdenados, const double& c, const int& formSimilitud, const double& b, const double& k1) const;
+
+    string getNombreFichero(int x) const { return nombreFicheroPuro[x-1]; }
 };
 #endif
