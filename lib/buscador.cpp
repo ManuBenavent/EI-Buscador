@@ -2,29 +2,6 @@
 
 /*
 * ----------------------------------------------------------------------------------------------------------------
-* Clase ResultadoRI
-* ----------------------------------------------------------------------------------------------------------------
-*/
-ResultadoRI::ResultadoRI(const double& kvSimilitud, const long int& kidDoc, const int& np){
-    vSimilitud = kvSimilitud;
-    idDoc = kidDoc;
-    numPregunta = np;
-}
-
-bool ResultadoRI::operator< (const ResultadoRI& lhs) const{
-    if(numPregunta == lhs.numPregunta)
-        return vSimilitud < lhs.vSimilitud;
-    else
-        return numPregunta > lhs.numPregunta;
-}
-
-ostream& operator<< (ostream& os, const ResultadoRI &res){
-    os << res.vSimilitud << "\t\t" << res.idDoc << "\tt" << res.numPregunta << endl;
-    return os;
-}
-
-/*
-* ----------------------------------------------------------------------------------------------------------------
 * Clase Buscador
 * ----------------------------------------------------------------------------------------------------------------
 */
@@ -75,6 +52,7 @@ bool Buscador::Buscar(const int& numDocumentos){
         InformacionTermino inf;
         Devuelve(it->first, inf);
         auto l_docs = inf.getMap();
+
         for(auto term = l_docs.begin(); term != l_docs.end(); term++){
             double res;
             // TODO comprobar logs de negativos

@@ -1123,3 +1123,68 @@ ostream& operator<<(ostream& s, const IndexadorHash& p) {
     s << "Se almacenaran las posiciones de los terminos: " << p.almacenarPosTerm;
     return s;
 }
+
+bool IndexadorHash::Buscar(const int& numDocs, set<ResultadoRI>& docsOrdenados, const int& c, const int& formSimilitud, const int& b, const int& k1) const{
+    if(indicePregunta.empty()){ // No hay ninguna pregunta indexada con terminos validos
+        return false;
+    }
+    docsOrdenados.clear();
+
+    map<long int, ResultadoRI> mapa;
+    for(unordered_map<string, InformacionTerminoPregunta>::const_iterator it = indicePregunta.begin(); it != indicePregunta.end(); it++){
+        unordered_map<string, InformacionTermino>::const_iterator infIterator = indice.find(it->first);
+        if(infIterator == indice.end())
+            continue;
+
+        auto l_docs = infIterator->second.getMap();
+
+        for(unordered_map<long int, InfTermDoc>::const_iterator term = l_docs.begin(); term != l_docs.end(); term++){
+            double res;
+            // TODO comprobar logs de negativos
+            if(formSimilitud == 0){
+                double ftd = term->second.get_ft() * log2(1 + ( (c * MediaDocsSinParada) /PalSinParadaDocs[term->first-1]) );
+                double lambdat = (double)infIterator->second.get_ftc()/NumDocsIndexados();
+                double aux = (log2(1 + lambdat) + ftd*log2((1+lambdat)/lambdat)) * ((infIterator->second.get_ftc() + 1) / (l_docs.size()*(ftd + 1)));
+                res = ((double)it->second.get_ft()/infPregunta.getNumTotalPalSinParada()) * aux;
+            }
+            else
+                res = (it->second.getIDF()*term->second.get_ft()*(k1 + 1)) / (term->second.get_ft() + (k1 * (1 - b + ((b*PalSinParadaDocs[term->first-1])/getMediaDocsSinparada()))));
+            
+            map<long int, ResultadoRI>::iterator pos = mapa.find(term->first);
+            if(pos != mapa.end())
+                pos->second.vSimilitud+=res;
+            else
+                mapa[term->first] = ResultadoRI(res, term->first, 0);
+        }
+    }
+    int i = 0;
+    // TODO insertar el ultimo primero es mas eficiente?
+    for(auto it = mapa.begin(); it != mapa.end() && i < numDocs; it++){
+        docsOrdenados.insert(it->second);
+        i++;
+    }
+    return true;
+}
+
+/*
+* ----------------------------------------------------------------------------------------------------------------
+* Clase ResultadoRI
+* ----------------------------------------------------------------------------------------------------------------
+*/
+ResultadoRI::ResultadoRI(const double& kvSimilitud, const long int& kidDoc, const int& np){
+    vSimilitud = kvSimilitud;
+    idDoc = kidDoc;
+    numPregunta = np;
+}
+
+bool ResultadoRI::operator< (const ResultadoRI& lhs) const{
+    if(numPregunta == lhs.numPregunta)
+        return vSimilitud < lhs.vSimilitud;
+    else
+        return numPregunta > lhs.numPregunta;
+}
+
+ostream& operator<< (ostream& os, const ResultadoRI &res){
+    os << res.vSimilitud << "\t\t" << res.idDoc << "\tt" << res.numPregunta << endl;
+    return os;
+}

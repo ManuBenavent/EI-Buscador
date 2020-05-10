@@ -3,6 +3,8 @@
 #include <iostream>
 #include <unordered_map>
 #include <unordered_set>
+#include <set>
+#include <map>
 #include <vector>
 #include <sys/stat.h>
 #include <time.h>
@@ -25,6 +27,24 @@ typedef struct {
     streampos posLista;
 } InfTermDocBinario;
 
+class ResultadoRI {
+    friend class IndexadorHash;
+    friend class Buscador;
+    friend ostream& operator<<(ostream& s, const ResultadoRI& res);
+private:
+    double vSimilitud;
+    long int idDoc;
+    int numPregunta;
+public:
+    ResultadoRI(){}
+    ResultadoRI(const double& kvSimilitud, const long int& kidDoc, const int& np);
+    ResultadoRI& operator=(const ResultadoRI& p){vSimilitud = p.vSimilitud; idDoc = p.idDoc; numPregunta = p.numPregunta; return *this;}
+    ResultadoRI(const ResultadoRI& p){vSimilitud = p.vSimilitud; idDoc = p.idDoc; numPregunta = p.numPregunta;}
+    double Vsimilitud() const { return vSimilitud; }
+    long int IdDoc() const { return idDoc; }
+    bool operator< (const ResultadoRI& lhs) const;
+};
+
 class IndexadorHash {
     friend ostream& operator<<(ostream& s, const IndexadorHash& p);
 private:
@@ -44,7 +64,7 @@ private:
 
     string pregunta;
 
-    
+    unordered_map<string, InformacionTerminoPregunta> indicePregunta;
 
     InformacionPregunta infPregunta;
 
@@ -70,25 +90,13 @@ private:
 
     void DevuelveDoc(streampos, InfDoc &infDoc) const;
 
-    
-
-public:   
-
-    // Nuevo
-
     vector<long int> PalSinParadaDocs;
 
     double MediaDocsSinParada;
 
     vector<string> nombreFicheroPuro;
 
-    string getNombreFichero(const int& x) const {return nombreFicheroPuro[x-1];}
-
-    double getMediaDocsSinparada() const { return MediaDocsSinParada; }
-
-    //long int getDocSinParada(const int& x) const { return PalSinParadaDocs[x-1]; }
-
-    unordered_map<string, InformacionTerminoPregunta> indicePregunta; // TODO devolver a parte privada
+public:   
 
     IndexadorHash(const string& ficheroStopWords, const string& delimitadores, const bool& detectComp, const bool& minuscSinAcentos, 
                 const string& dirIndice, const int& tStemmer, const bool& almEnDisco, const bool& almPosTerm);
@@ -174,5 +182,7 @@ public:
     void ListarDocs() const;
     
     bool ListarDocs(const string& nomDoc) const;
+
+    bool Buscar(const int& numDocs, set<ResultadoRI>& docsOrdenados, const int& c, const int& formSimilitud, const int& b, const int& k1) const;
 };
 #endif

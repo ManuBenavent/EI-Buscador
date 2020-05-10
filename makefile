@@ -10,8 +10,8 @@ OBJ = $(patsubst %,$(LIBDIR)/%,$(_OBJ))
 
 all: buscador
 
-buscador: src/tad02.cpp $(OBJ)
-	$(CC) $(OPTIONS) $(DEBUG) -I$(INCLUDEDIR) src/tad02.cpp $(OBJ) -o buscador
+buscador: src/main.cpp $(OBJ)
+	$(CC) $(OPTIONS) $(DEBUG) -I$(INCLUDEDIR) src/main.cpp $(OBJ) -o buscador
 
 $(LIBDIR)/%.o : $(LIBDIR)/%.cpp $(INCLUDEDIR)/%.h
 	$(CC) $(OPTIONS) $(DEBUG) -c -I$(INCLUDEDIR) -o $@ $<

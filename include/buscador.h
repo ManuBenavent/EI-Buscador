@@ -6,23 +6,6 @@
 #include <map>
 #include <math.h>
 
-class ResultadoRI {
-    friend class Buscador;
-    friend ostream& operator<<(ostream& s, const ResultadoRI& res);
-private:
-    double vSimilitud;
-    long int idDoc;
-    int numPregunta;
-public:
-    ResultadoRI(){}
-    ResultadoRI(const double& kvSimilitud, const long int& kidDoc, const int& np);
-    ResultadoRI& operator=(const ResultadoRI& p){vSimilitud = p.vSimilitud; idDoc = p.idDoc; numPregunta = p.numPregunta; return *this;}
-    ResultadoRI(const ResultadoRI& p){vSimilitud = p.vSimilitud; idDoc = p.idDoc; numPregunta = p.numPregunta;}
-    double Vsimilitud() const { return vSimilitud; }
-    long int IdDoc() const { return idDoc; }
-    bool operator< (const ResultadoRI& lhs) const;
-};
-
 class Buscador: public IndexadorHash {
     friend ostream& operator<<(ostream& s, const Buscador& p);
 private:
