@@ -702,7 +702,10 @@ bool IndexadorHash::IndexarPregunta(const string& preg){
     list<string> tokens;
     stemmerPorter stemmer;
     try{
-    tok.Tokenizar(preg, tokens);
+        bool previo = tok.PasarAminuscSinAcentos();
+        tok.PasarAminuscSinAcentos(true);
+        tok.Tokenizar(preg, tokens);
+        tok.PasarAminuscSinAcentos(previo);
     
     for(list<string>::iterator it = tokens.begin(); it != tokens.end(); it++){
         infPregunta.addPal();
