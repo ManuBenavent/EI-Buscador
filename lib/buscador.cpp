@@ -101,6 +101,11 @@ bool Buscador::Buscar(const int& numDocumentos){
         return false;
     }
     docsOrdenados.clear();
+
+    return BuscarInterno(numDocumentos, 0);
+}
+
+bool Buscador::BuscarInterno(const int& numDocumentos, const int& numPreg){
     // Almacena la información de la búsqueda para que sea accesible por id
     map<long int, ResultadoRI> mapa;
     // Solo recorro los términos 'útiles' de la pregunta indexada
@@ -113,8 +118,6 @@ bool Buscador::Buscar(const int& numDocumentos){
         // Recorro los documentos que contienen ese termino
         unordered_map<long int, InfTermDoc> l_docs = infIterator->second.getMap();
         for(unordered_map<long int, InfTermDoc>::const_iterator term = l_docs.begin(); term != l_docs.end(); term++){
-            if(term->first == 48)
-                cout << "el gorrino";
             double res;
             if(formSimilitud == 0){
                 res = ((double)it->second.get_ft()/(double)infPregunta.getNumTotalPalSinParada()) * term->second.PesoDFR(); // TODO optimizar más
@@ -127,7 +130,7 @@ bool Buscador::Buscar(const int& numDocumentos){
             if(pos != mapa.end())
                 pos->second.vSimilitud+=res;
             else
-                mapa[term->first] = ResultadoRI(res, term->first, 0);
+                mapa[term->first] = ResultadoRI(res, term->first, numPreg);
         }
     }
     int i = 0;
@@ -139,26 +142,23 @@ bool Buscador::Buscar(const int& numDocumentos){
     return true;
 }
 
-// TODO
-bool Buscador::Buscar(const string& dirPreguntas, const int& numDocumentos, const int& numPregInicio){
-    /*
-    Realizará la búsqueda entre el número de pregunta “numPregInicio” y
-“numPregFin”, ambas preguntas incluidas. El corpus de preguntas estará
-en el directorio “dirPreguntas”, y tendrá la estructura de cada pregunta
-en un fichero independiente, de nombre el número de pregunta, y
-extensión “.txt” (p.ej. 1.txt 2.txt 3.txt ... 83.txt). Esto significa
-que habrá que indexar cada pregunta por separado y ejecutar una búsqueda
-por cada pregunta añadiendo los resultados de cada pregunta (junto con
-su número de pregunta) en la variable privada “docsOrdenados”. Asimismo,
-se supone que previamente se mantendrá la indexación del corpus.
-// Se guardarán los primeros “numDocumentos” documentos más relevantes
-para cada pregunta en la variable privada “docsOrdenados”
-// La búsqueda se realiza con la fórmula de similitud indicada en la
-variable privada “formSimilitud”.
-Devuelve falso si no finaliza la búsqueda (p.ej. por falta de
-memoria), mostrando el mensaje de error correspondiente, indicando el
-documento, pregunta y término en el que se ha quedado.
-    */
+bool Buscador::Buscar(const string& dirPreguntas, const int& numDocumentos, const int& numPregInicio, const int& numPregFin){
+    ifstream fich;
+    string preg;
+    bool res = true;
+    docsOrdenados.clear();
+    for (int i = numPregInicio; i < numPregFin; i++){
+        fich.open(dirPreguntas + to_string(i) + ".txt");
+        if(!fich){
+            cerr << "ERROR: No se pudo abrir la pregunta " << dirPreguntas + to_string(i) + ".txt" << endl;
+            return false;
+        }
+        getline(fich, preg);
+        fich.close();
+        IndexarPregunta(preg);
+        res = BuscarInterno(numDocumentos, i) && res;
+    }
+    return res;
 }
 
 void Buscador::ImprimirResultadoBusqueda(const int& numDocumentos) const{

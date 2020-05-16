@@ -15,9 +15,6 @@ buscador: src/main.cpp $(OBJ)
 
 $(LIBDIR)/%.o : $(LIBDIR)/%.cpp $(INCLUDEDIR)/%.h
 	$(CC) $(OPTIONS) $(DEBUG) -c -I$(INCLUDEDIR) -o $@ $<
-
-memory: memory.cpp
-		$(CC) memory.cpp -o memory
 		
 clean:
-	rm -f $(OBJ) buscador memory */*.tk
+	rm -f $(OBJ) buscador */*.tk

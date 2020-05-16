@@ -57,6 +57,8 @@ private:
 
     // Actualiza los valores del almacenados para DFR y BM25
     void ActualizaPesos();
+
+    bool BuscarInterno(const int& numDocumentos, const int& numPreg);
 public:
     Buscador(const string& directorioIndexacion, const int& f);
 
@@ -70,7 +72,7 @@ public:
     bool Buscar(const int& numDocumentos = 99999);
 
     // TODO
-    bool Buscar(const string& dirPreguntas, const int& numDocumentos, const int& numPregInicio);
+    bool Buscar(const string& dirPreguntas, const int& numDocumentos, const int& numPregInicio, const int& numPregFin);
 
     void ImprimirResultadoBusqueda(const int& numDocumentos = 99999) const;
 
