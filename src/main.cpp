@@ -18,7 +18,7 @@ double getcputime(void) {
 main() {
     // Indexacion
     IndexadorHash b("./StopWordsEspanyol.txt", ". ,:", false, false, "./indicePruebaEspanyol", 0, false, false);
-    b.Indexar("ficherosTimes.txt");
+    b.Indexar("ficheroTimes.txt");
     b.GuardarIndexacion();
     // Creo el buscador
     Buscador a("./indicePruebaEspanyol", 0);
@@ -34,12 +34,12 @@ main() {
     double AA = getcputime()-aa;
     cout << "\nHa tardado " << AA << " segundos\n\n";
     
-    time_t inicioB, finB;
+    /*time_t inicioB, finB;
     time(&inicioB);
     double aaB=getcputime();
 
     a.Buscar("/home/tad/12-13/eiBuscador/CorpusTime/Preguntas/", 423, 1,83);
     a.ImprimirResultadoBusqueda(423);
     double bbB=getcputime()-aaB;
-    cout << "\nHa tardado " << bbB << " segundos\n\n";
+    cout << "\nHa tardado " << bbB << " segundos\n\n";*/
 }

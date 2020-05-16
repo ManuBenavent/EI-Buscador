@@ -3,8 +3,6 @@
 #include <iostream>
 #include <unordered_map>
 #include <unordered_set>
-#include <set>
-#include <map>
 #include <vector>
 #include <sys/stat.h>
 #include <time.h>
@@ -27,46 +25,19 @@ typedef struct {
     streampos posLista;
 } InfTermDocBinario;
 
-class ResultadoRI {
-    friend class IndexadorHash;
-    friend class Buscador;
-    friend ostream& operator<<(ostream& s, const ResultadoRI& res);
-private:
-    double vSimilitud;
-    long int idDoc;
-    int numPregunta;
-public:
-    ResultadoRI(){}
-    ResultadoRI(const double& kvSimilitud, const long int& kidDoc, const int& np);
-    ResultadoRI& operator=(const ResultadoRI& p){vSimilitud = p.vSimilitud; idDoc = p.idDoc; numPregunta = p.numPregunta; return *this;}
-    ResultadoRI(const ResultadoRI& p){vSimilitud = p.vSimilitud; idDoc = p.idDoc; numPregunta = p.numPregunta;}
-    double Vsimilitud() const { return vSimilitud; }
-    long int IdDoc() const { return idDoc; }
-    bool operator< (const ResultadoRI& lhs) const;
-};
 
 class IndexadorHash {
     friend ostream& operator<<(ostream& s, const IndexadorHash& p);
 private:
     IndexadorHash();
 
-    unordered_map<string, InformacionTermino> indice;
-
     unordered_map<string, InformacionTermino> indiceUpdates;
 
     unordered_map<string, streampos> indiceMinimo;
 
-    unordered_map<string, InfDoc> indiceDocs;
-
     unordered_map<string, streampos> indiceDocsMinimo;
 
     InfColeccionDocs informacionColeccionDocs;
-
-    string pregunta;
-
-    unordered_map<string, InformacionTerminoPregunta> indicePregunta;
-
-    InformacionPregunta infPregunta;
 
     unordered_set<string> stopWords;
 
@@ -90,11 +61,16 @@ private:
 
     void DevuelveDoc(streampos, InfDoc &infDoc) const;
 
-    vector<long int> PalSinParadaDocs;
+protected: 
+    unordered_map<string, InformacionTermino> indice;
 
-    double MediaDocsSinParada;
+    unordered_map<string, InfDoc> indiceDocs;
 
-    vector<string> nombreFicheroPuro;
+    string pregunta;
+
+    unordered_map<string, InformacionTerminoPregunta> indicePregunta;
+
+    InformacionPregunta infPregunta;
 
 public:   
 
@@ -182,9 +158,5 @@ public:
     void ListarDocs() const;
     
     bool ListarDocs(const string& nomDoc) const;
-
-    bool BuscarIndex(const int& numDocs, set<ResultadoRI>& docsOrdenados, const double& c, const int& formSimilitud, const double& b, const double& k1) const;
-
-    string getNombreFichero(int x) const { return nombreFicheroPuro[x-1]; }
 };
 #endif

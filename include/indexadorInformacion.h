@@ -33,21 +33,26 @@ class InfTermDoc {
 private:
     int ft;
     list<int> posTerm;
+    double DFR;
+    double BM25;
 public:
     // Clase
     InfTermDoc (const InfTermDoc &p);
-    InfTermDoc () { ft = 0; }
+    InfTermDoc () { ft = 0; DFR = 0; BM25 = 0; }
     ~InfTermDoc ();
     InfTermDoc & operator= (const InfTermDoc &p);
     InfTermDoc & operator+ (const InfTermDoc &p);
     // Setters
     void set_ft(int x) { ft = x; }
+    void setPesos(const double& dfr, const double &bm25) { DFR = dfr; BM25 = bm25; }
     // Add
     void add_ft() { this->ft++; }
     void add_posTerm(int pos) { posTerm.push_back(pos); }
     // Getters
     int get_ft() const { return ft; }
     list<int> getList() const { return posTerm; }
+    double PesoDFR() const { return DFR; }
+    double PesoBM25() const { return BM25; }
     // Otros
     void Vaciar() { posTerm.clear(); ft = 0;}
     string ToFile() const;
@@ -82,6 +87,7 @@ public:
     bool CompruebaDocumento(long int id) const;
     bool BorraDoc(long int id);
     string ToFile() const;
+    void ActualizaPesos(const long int & id, const double& dfr, const double& bm25) { l_docs[id].setPesos(dfr, bm25); }
 };
 
 

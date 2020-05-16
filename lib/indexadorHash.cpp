@@ -43,16 +43,6 @@ IndexadorHash::IndexadorHash(const string& directorioIndexacion){
     if(!RecuperarIndexacion(directorioIndexacion)){
         cerr << "ERROR: No se pudo recuperar la indexacion";
     }
-    double res = 0;
-    string::size_type pos; 
-    for(auto it = indiceDocs.begin(); it != indiceDocs.end(); it++){
-        pos = it->first.find_last_of('/');
-        pos = pos==string::npos?0:pos + 1;
-        nombreFicheroPuro.push_back(it->first.substr(pos,it->first.find('.')-pos));
-        PalSinParadaDocs.push_back(it->second.getNumPalNoStop());
-        res += it->second.getNumPalNoStop();
-    }
-    MediaDocsSinParada = res / PalSinParadaDocs.size();
 }
 
 IndexadorHash::IndexadorHash(const IndexadorHash& i){
@@ -702,10 +692,7 @@ bool IndexadorHash::IndexarPregunta(const string& preg){
     list<string> tokens;
     stemmerPorter stemmer;
     try{
-        bool previo = tok.PasarAminuscSinAcentos();
-        tok.PasarAminuscSinAcentos(true);
         tok.Tokenizar(preg, tokens);
-        tok.PasarAminuscSinAcentos(previo);
     
     for(list<string>::iterator it = tokens.begin(); it != tokens.end(); it++){
         infPregunta.addPal();
@@ -1127,77 +1114,4 @@ ostream& operator<<(ostream& s, const IndexadorHash& p) {
     s << "Se almacenara parte del indice en disco duro: " << p.almacenarEnDisco << endl;
     s << "Se almacenaran las posiciones de los terminos: " << p.almacenarPosTerm;
     return s;
-}
-
-bool IndexadorHash::BuscarIndex(const int& numDocs, set<ResultadoRI>& docsOrdenados, const double& c, const int& formSimilitud, const double& b, const double& k1) const{
-    if(indicePregunta.empty()){ // No hay ninguna pregunta indexada con terminos validos
-        return false;
-    }
-    docsOrdenados.clear();
-    // Variables para evitar cálculos repetidos
-    double k11 = k1 + 1;
-    double b1 = 1 - b;
-    // Almacena la información de la búsqueda para que sea accesible por id
-    map<long int, ResultadoRI> mapa;
-    // Solo recorro los términos 'útiles' de la pregunta indexada
-    for(unordered_map<string, InformacionTerminoPregunta>::const_iterator it = indicePregunta.begin(); it != indicePregunta.end(); it++){
-        // Obtengo InformacionTermino (si existe) para el termino
-        unordered_map<string, InformacionTermino>::const_iterator infIterator = indice.find(it->first);
-        if(infIterator == indice.end())
-            continue;
-
-        // Recorro los documentos que contienen ese termino
-        unordered_map<long int, InfTermDoc> l_docs = infIterator->second.getMap();
-        for(unordered_map<long int, InfTermDoc>::const_iterator term = l_docs.begin(); term != l_docs.end(); term++){
-            double res;
-            // DFR
-            if(formSimilitud == 0){
-                // TODO: optimizar + logs < 0
-                double ftd = term->second.get_ft() * log2(1 + ( (c * MediaDocsSinParada) /PalSinParadaDocs[term->first-1]) );
-                double lambdat = (double)infIterator->second.get_ftc()/NumDocsIndexados();
-                double aux = (log2(1 + lambdat) + ftd*log2((1+lambdat)/lambdat)) * ((infIterator->second.get_ftc() + 1) / (l_docs.size()*(ftd + 1)));
-                res = ((double)it->second.get_ft()/infPregunta.getNumTotalPalSinParada()) * aux;
-            }
-            // BM25
-            else
-                res = (it->second.getIDF()*term->second.get_ft()*k11) / (term->second.get_ft() + (k1 * (b1 + ((b*PalSinParadaDocs[term->first-1])/MediaDocsSinParada))));
-            
-            // Si existe actualizo valor sino inserto nuevo par en el mapa
-            map<long int, ResultadoRI>::iterator pos = mapa.find(term->first);
-            if(pos != mapa.end())
-                pos->second.vSimilitud+=res;
-            else
-                mapa[term->first] = ResultadoRI(res, term->first, 0);
-        }
-    }
-    int i = 0;
-    // TODO insertar el ultimo primero es mas eficiente?
-    for(auto it = mapa.begin(); it != mapa.end() && i < numDocs; it++){
-        docsOrdenados.insert(it->second);
-        i++;
-    }
-    return true;
-}
-
-/*
-* ----------------------------------------------------------------------------------------------------------------
-* Clase ResultadoRI
-* ----------------------------------------------------------------------------------------------------------------
-*/
-ResultadoRI::ResultadoRI(const double& kvSimilitud, const long int& kidDoc, const int& np){
-    vSimilitud = kvSimilitud;
-    idDoc = kidDoc;
-    numPregunta = np;
-}
-
-bool ResultadoRI::operator< (const ResultadoRI& lhs) const{
-    if(numPregunta == lhs.numPregunta)
-        return vSimilitud < lhs.vSimilitud;
-    else
-        return numPregunta > lhs.numPregunta;
-}
-
-ostream& operator<< (ostream& os, const ResultadoRI &res){
-    os << res.vSimilitud << "\t\t" << res.idDoc << "\tt" << res.numPregunta << endl;
-    return os;
 }

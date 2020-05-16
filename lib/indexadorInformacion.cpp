@@ -92,16 +92,22 @@ ostream& operator<<(ostream& s, const InformacionTermino& p) {
 InfTermDoc::InfTermDoc(const InfTermDoc &p){
     this->ft = p.ft;
     this->posTerm = p.posTerm;
+    this->DFR = p.DFR;
+    this->BM25 = p.BM25;
 }
 
 InfTermDoc& InfTermDoc::operator= (const InfTermDoc &p){
     this->ft = p.ft;
     this->posTerm = p.posTerm;
+    this->DFR = p.DFR;
+    this->BM25 = p.BM25;
     return *this;
 }
 
 InfTermDoc & InfTermDoc::operator+ (const InfTermDoc &p){
     this->ft += p.ft;
+    this->DFR += p.DFR;
+    this->BM25 += p.BM25;
     for(list<int>::const_iterator it = p.posTerm.begin(); it != p.posTerm.end(); it++)
         this->posTerm.push_back(*it);
     return (*this);
@@ -109,6 +115,8 @@ InfTermDoc & InfTermDoc::operator+ (const InfTermDoc &p){
 
 InfTermDoc::~InfTermDoc(){
     this->ft = 0;
+    this->DFR = 0;
+    this->BM25 = 0;
     this->posTerm.clear();
 }
 

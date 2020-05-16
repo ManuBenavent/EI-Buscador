@@ -6,6 +6,24 @@
 #include <map>
 #include <math.h>
 
+class ResultadoRI {
+    friend class IndexadorHash;
+    friend class Buscador;
+    friend ostream& operator<<(ostream& s, const ResultadoRI& res);
+private:
+    double vSimilitud;
+    long int idDoc;
+    int numPregunta;
+public:
+    ResultadoRI(){}
+    ResultadoRI(const double& kvSimilitud, const long int& kidDoc, const int& np);
+    ResultadoRI& operator=(const ResultadoRI& p){vSimilitud = p.vSimilitud; idDoc = p.idDoc; numPregunta = p.numPregunta; return *this;}
+    ResultadoRI(const ResultadoRI& p){vSimilitud = p.vSimilitud; idDoc = p.idDoc; numPregunta = p.numPregunta;}
+    double Vsimilitud() const { return vSimilitud; }
+    long int IdDoc() const { return idDoc; }
+    bool operator< (const ResultadoRI& lhs) const;
+};
+
 class Buscador: public IndexadorHash {
     friend ostream& operator<<(ostream& s, const Buscador& p);
 private:
@@ -25,6 +43,20 @@ private:
 
     // Constante modelo BM25
     double b;
+    
+    //Valores para agilizar el acceso a ciertos campos
+
+    //Num pal sin parada de un documento (se accede por id doc - 1)
+    vector<long int> PalSinParadaDocs;
+
+    // Media de todos los valores anteriores
+    double MediaDocsSinParada;
+
+    // Nombres de los ficheros ajustandose a la salida correcta, acceso mediante id - 1
+    vector<string> nombreFicheroPuro;
+
+    // Actualiza los valores del almacenados para DFR y BM25
+    void ActualizaPesos();
 public:
     Buscador(const string& directorioIndexacion, const int& f);
 
@@ -52,9 +84,9 @@ public:
 
     double DevolverParametrosDFR() const { return c; }
 
-    void CambiarParametrosBM35(const double& kk1, const double& kb) { k1 = kk1; b = kb; }
+    void CambiarParametrosBM35(const double& kk1, const double& kb) { k1 = kk1; b = kb; ActualizaPesos(); }
 
-    void DevolverParametrosBM25(double& kk1, double& kb) const { kk1 = k1; kb = b; }
+    void DevolverParametrosBM25(double& kk1, double& kb) { kk1 = k1; kb = b; ActualizaPesos(); }
 };
 
 #endif
