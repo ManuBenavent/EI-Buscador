@@ -61,11 +61,11 @@ void Buscador::ActualizaPesos(){
         unordered_map<long int, InfTermDoc> l_docs = it->second.getMap();
         for(unordered_map<long int, InfTermDoc>::const_iterator term = l_docs.begin(); term != l_docs.end(); term++){
             // DFR
-            double ftd = term->second.get_ft() * log2(1 + ( (c * MediaDocsSinParada) /PalSinParadaDocs[term->first-1]) );
-            double lambdat = (double)it->second.get_ftc()/NumDocsIndexados();
-            double DFR = (log2(1 + lambdat) + ftd*log2((1+lambdat)/lambdat)) * ((it->second.get_ftc() + 1) / (l_docs.size()*(ftd + 1)));
+            double ftd = (double)term->second.get_ft() * log2(1 + ( (c * MediaDocsSinParada) / (double)PalSinParadaDocs[term->first-1]) );
+            double lambdat = (double)it->second.get_ftc()/(double)NumDocsIndexados();
+            double DFR = (log2(1.0 + lambdat) + ftd*log2((1+lambdat)/lambdat)) * (((double)it->second.get_ftc() + 1) / ((double)l_docs.size()*(ftd + 1.0)));
             // BM25
-            double BM25 = (term->second.get_ft()*(k1 + 1)) / (term->second.get_ft() + (k1 * (1 - b + ((b*PalSinParadaDocs[term->first-1])/MediaDocsSinParada))));
+            double BM25 = ((double)term->second.get_ft()*(k1 + 1)) / ((double)term->second.get_ft() + (k1 * (1.0 - b + (((double)b*(double)PalSinParadaDocs[term->first-1])/MediaDocsSinParada))));
             it->second.ActualizaPesos(term->first, DFR, BM25);
         }
     }
@@ -94,15 +94,11 @@ Buscador& Buscador::operator=(const Buscador& p){
     return (*this);
 }
 
-// TODO
 bool Buscador::Buscar(const int& numDocumentos){
     if(indicePregunta.empty()){ // No hay ninguna pregunta indexada con terminos validos
         return false;
     }
     docsOrdenados.clear();
-    // Variables para evitar cálculos repetidos
-    double k11 = k1 + 1;
-    double b1 = 1 - b;
     // Almacena la información de la búsqueda para que sea accesible por id
     map<long int, ResultadoRI> mapa;
     // Solo recorro los términos 'útiles' de la pregunta indexada
@@ -115,12 +111,14 @@ bool Buscador::Buscar(const int& numDocumentos){
         // Recorro los documentos que contienen ese termino
         unordered_map<long int, InfTermDoc> l_docs = infIterator->second.getMap();
         for(unordered_map<long int, InfTermDoc>::const_iterator term = l_docs.begin(); term != l_docs.end(); term++){
+            if(term->first == 48)
+                cout << "el gorrino";
             double res;
             if(formSimilitud == 0){
-                res = ((double)it->second.get_ft()/infPregunta.getNumTotalPalSinParada()) * term->second.PesoDFR();
+                res = ((double)it->second.get_ft()/(double)infPregunta.getNumTotalPalSinParada()) * term->second.PesoDFR(); // TODO optimizar más
             }
             else
-                res = it->second.getIDF()*term->second.PesoBM25();
+                res = (double)it->second.getIDF()*term->second.PesoBM25();
             
             // Si existe actualizo valor sino inserto nuevo par en el mapa
             map<long int, ResultadoRI>::iterator pos = mapa.find(term->first);
