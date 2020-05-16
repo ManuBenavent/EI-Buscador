@@ -44,11 +44,13 @@ Buscador::Buscador(const string& directorioIndexacion, const int& f):IndexadorHa
     this->b = 0.75;
     double res = 0;
     string::size_type pos; 
+    nombreFicheroPuro.resize(NumDocsIndexados());
+    PalSinParadaDocs.resize(NumDocsIndexados());
     for(auto it = indiceDocs.begin(); it != indiceDocs.end(); it++){
         pos = it->first.find_last_of('/');
         pos = pos==string::npos?0:pos + 1;
-        nombreFicheroPuro.push_back(it->first.substr(pos,it->first.find('.')-pos));
-        PalSinParadaDocs.push_back(it->second.getNumPalNoStop());
+        nombreFicheroPuro[it->second.getId()-1] = (it->first.substr(pos,it->first.find('.')-pos));
+        PalSinParadaDocs[it->second.getId()-1] = (it->second.getNumPalNoStop());
         res += it->second.getNumPalNoStop();
     }
     MediaDocsSinParada = res / PalSinParadaDocs.size();
