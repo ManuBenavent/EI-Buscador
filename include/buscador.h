@@ -18,7 +18,7 @@ public:
     ResultadoRI(){}
     ResultadoRI(const double& kvSimilitud, const long int& kidDoc, const int& np);
     ResultadoRI& operator=(const ResultadoRI& p){vSimilitud = p.vSimilitud; idDoc = p.idDoc; numPregunta = p.numPregunta; return *this;}
-    ResultadoRI(const ResultadoRI& p){vSimilitud = p.vSimilitud; idDoc = p.idDoc; numPregunta = p.numPregunta;}
+    ResultadoRI(const ResultadoRI& p){vSimilitud = p.vSimilitud; idDoc = p.idDoc; numPregunta = p.numPregunta; }
     double Vsimilitud() const { return vSimilitud; }
     long int IdDoc() const { return idDoc; }
     bool operator< (const ResultadoRI& lhs) const;
@@ -59,6 +59,8 @@ private:
     void ActualizaPesos();
 
     bool BuscarInterno(const int& numDocumentos, const int& numPreg);
+
+    int NumeroDocumentosPorPregunta;
 public:
     Buscador(const string& directorioIndexacion, const int& f);
 

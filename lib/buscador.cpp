@@ -49,7 +49,7 @@ Buscador::Buscador(const string& directorioIndexacion, const int& f):IndexadorHa
     for(auto it = indiceDocs.begin(); it != indiceDocs.end(); it++){
         pos = it->first.find_last_of('/');
         pos = pos==string::npos?0:pos + 1;
-        nombreFicheroPuro[it->second.getId()-1] = (it->first.substr(pos,it->first.find('.')-pos));
+        nombreFicheroPuro[it->second.getId()-1] = (it->first.substr(pos,it->first.find('.', pos)-pos));
         PalSinParadaDocs[it->second.getId()-1] = (it->second.getNumPalNoStop());
         res += it->second.getNumPalNoStop();
     }
@@ -97,6 +97,7 @@ Buscador& Buscador::operator=(const Buscador& p){
 }
 
 bool Buscador::Buscar(const int& numDocumentos){
+    NumeroDocumentosPorPregunta = numDocumentos;
     if(indicePregunta.empty()){ // No hay ninguna pregunta indexada con terminos validos
         return false;
     }
@@ -143,11 +144,12 @@ bool Buscador::BuscarInterno(const int& numDocumentos, const int& numPreg){
 }
 
 bool Buscador::Buscar(const string& dirPreguntas, const int& numDocumentos, const int& numPregInicio, const int& numPregFin){
+    NumeroDocumentosPorPregunta = numDocumentos;
     ifstream fich;
     string preg;
     bool res = true;
     docsOrdenados.clear();
-    for (int i = numPregInicio; i < numPregFin; i++){
+    for (int i = numPregInicio; i <= numPregFin; i++){
         fich.open(dirPreguntas + to_string(i) + ".txt");
         if(!fich){
             cerr << "ERROR: No se pudo abrir la pregunta " << dirPreguntas + to_string(i) + ".txt" << endl;
@@ -162,29 +164,32 @@ bool Buscador::Buscar(const string& dirPreguntas, const int& numDocumentos, cons
 }
 
 void Buscador::ImprimirResultadoBusqueda(const int& numDocumentos) const{
-    string pregunta="";
-    this->DevuelvePregunta(pregunta);
-    int i = numDocumentos;
-    for(set<ResultadoRI>::reverse_iterator it = docsOrdenados.rbegin(); it != docsOrdenados.rend() && i > 0; it++){
-        cout << (*it).numPregunta << " " << (this->formSimilitud==0?"DFR":"BM25") << " " << nombreFicheroPuro[(*it).idDoc - 1] << " " << (numDocumentos - i) << " " 
-            << (*it).vSimilitud << " " << ((((*it).numPregunta)==0)?pregunta:"ConjuntoDePreguntas") << endl;
-        i--;
+    int i = 0;
+    for(set<ResultadoRI>::reverse_iterator it = docsOrdenados.rbegin(); it != docsOrdenados.rend(); it++){
+        if ( i < numDocumentos && i < NumeroDocumentosPorPregunta)
+            cout << (*it).numPregunta << " " << (this->formSimilitud==0?"DFR":"BM25") << " " << nombreFicheroPuro[(*it).idDoc - 1] << " " 
+            << i << " " << (*it).vSimilitud << " " << ((((*it).numPregunta)==0)?pregunta:"ConjuntoDePreguntas") << "\n";
+        i++;
+        if(i == NumeroDocumentosPorPregunta)
+            i = 0;
     }
 }
 
 bool Buscador::ImprimirResultadoBusqueda(const int& numDocumentos, const string& nomFichero) const{
-    string pregunta = "";
-    this->DevuelvePregunta(pregunta);
-    int i = numDocumentos;
     ofstream file;
     file.open(nomFichero.c_str());
     if(!file){
         cerr << "ERROR: No se pudo abrir el archivo nomFichero" << endl;
         return false;
     }
-    for(set<ResultadoRI>::reverse_iterator it = docsOrdenados.rbegin(); it != docsOrdenados.rend() && i > 0; it++){
-        file << (*it).numPregunta << " " << (this->formSimilitud==0?"DFR":"BM25") << " " << nombreFicheroPuro[(*it).idDoc - 1] << " " << (numDocumentos - i) << " " 
-            << (*it).vSimilitud << " " << ((((*it).numPregunta)==0)?pregunta:"ConjuntoDePreguntas") << "\n";
+    int i = 0;
+    for(set<ResultadoRI>::reverse_iterator it = docsOrdenados.rbegin(); it != docsOrdenados.rend(); it++){
+        if ( i < numDocumentos && i < NumeroDocumentosPorPregunta)
+            file << (*it).numPregunta << " " << (this->formSimilitud==0?"DFR":"BM25") << " " << nombreFicheroPuro[(*it).idDoc - 1] << " " 
+            << i << " " << (*it).vSimilitud << " " << ((((*it).numPregunta)==0)?pregunta:"ConjuntoDePreguntas") << "\n";
+        i++;
+        if(i == NumeroDocumentosPorPregunta)
+            i = 0;
     }
     file.close();
     return true;
