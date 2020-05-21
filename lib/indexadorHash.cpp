@@ -717,8 +717,8 @@ bool IndexadorHash::IndexarPregunta(const string& preg){
                 // Si el termino esta indexado almaceno el IDF
                 auto infoTermino = indice.find(*it);
                 if(infoTermino != indice.end()){
-                    int nqi = infoTermino->second.GetNumDocs();
-                    double aux = (informacionColeccionDocs.getNumDocs() - nqi + 0.5) / (nqi + 0.5);
+                    double nqi = (double)infoTermino->second.GetNumDocs();
+                    double aux = ((double)informacionColeccionDocs.getNumDocs() - nqi + 0.5) / (nqi + 0.5);
                     if(aux > 0)
                         infTerm.setIDF(log2(aux));
                 }

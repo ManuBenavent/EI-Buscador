@@ -108,7 +108,7 @@ bool Buscador::Buscar(const int& numDocumentos){
 
 bool Buscador::BuscarInterno(const int& numDocumentos, const int& numPreg){
     // Almacena la información de la búsqueda para que sea accesible por id
-    map<long int, ResultadoRI> mapa;
+    vector<ResultadoRI> docs (indiceDocs.size(), ResultadoRI(0,-1,-1));
     // Solo recorro los términos 'útiles' de la pregunta indexada
     for(unordered_map<string, InformacionTerminoPregunta>::const_iterator it = indicePregunta.begin(); it != indicePregunta.end(); it++){
         // Obtengo InformacionTermino (si existe) para el termino
@@ -120,29 +120,24 @@ bool Buscador::BuscarInterno(const int& numDocumentos, const int& numPreg){
         unordered_map<long int, InfTermDoc> l_docs = infIterator->second.getMap();
         for(unordered_map<long int, InfTermDoc>::const_iterator term = l_docs.begin(); term != l_docs.end(); term++){
             double res;
-            if(formSimilitud == 0){
+            if(formSimilitud == 0)
                 res = ((double)it->second.get_ft()/(double)infPregunta.getNumTotalPalSinParada()) * term->second.PesoDFR(); // TODO optimizar más
-            }
             else
                 res = (double)it->second.getIDF()*term->second.PesoBM25();
             
-            // Si existe actualizo valor sino inserto nuevo par en el mapa
-            map<long int, ResultadoRI>::iterator pos = mapa.find(term->first);
-            if(pos != mapa.end())
-                pos->second.vSimilitud+=res;
-            else
-                mapa[term->first] = ResultadoRI(res, term->first, numPreg);
+            docs[term->first-1] = ResultadoRI(docs[term->first-1].vSimilitud + res, term->first, numPreg);
         }
     }
-    if(mapa.size() == 0)
-        return false;
+
+    sort(docs.begin(), docs.end());
     int i = 0;
-    // TODO insertar el ultimo primero es mas eficiente?
-    for(auto it = mapa.begin(); it != mapa.end() && i < numDocumentos; it++){
-        docsOrdenados.insert(it->second);
+    for(auto it = docs.rbegin(); it != docs.rend() && i < numDocumentos; it++){
+        if((*it).idDoc == -1)
+            break;
+        docsOrdenados.insert(*it);
         i++;
     }
-    return true;
+    return docs[0].vSimilitud == 0;
 }
 
 bool Buscador::Buscar(const string& dirPreguntas, const int& numDocumentos, const int& numPregInicio, const int& numPregFin){
@@ -167,14 +162,16 @@ bool Buscador::Buscar(const string& dirPreguntas, const int& numDocumentos, cons
 
 void Buscador::ImprimirResultadoBusqueda(const int& numDocumentos) const{
     int i = 0;
+    stringstream res;
     for(set<ResultadoRI>::reverse_iterator it = docsOrdenados.rbegin(); it != docsOrdenados.rend(); it++){
         if ( i < numDocumentos && i < NumeroDocumentosPorPregunta)
-            cout << (*it).numPregunta << " " << (this->formSimilitud==0?"DFR":"BM25") << " " << nombreFicheroPuro[(*it).idDoc - 1] << " " 
+            res << (*it).numPregunta << " " << (this->formSimilitud==0?"DFR":"BM25") << " " << nombreFicheroPuro[(*it).idDoc - 1] << " " 
             << i << " " << (*it).vSimilitud << " " << ((((*it).numPregunta)==0)?pregunta:"ConjuntoDePreguntas") << "\n";
         i++;
         if(i == NumeroDocumentosPorPregunta)
             i = 0;
     }
+    cout << res.str();
 }
 
 bool Buscador::ImprimirResultadoBusqueda(const int& numDocumentos, const string& nomFichero) const{
@@ -184,15 +181,17 @@ bool Buscador::ImprimirResultadoBusqueda(const int& numDocumentos, const string&
         cerr << "ERROR: No se pudo abrir el archivo nomFichero" << endl;
         return false;
     }
+    stringstream res;
     int i = 0;
     for(set<ResultadoRI>::reverse_iterator it = docsOrdenados.rbegin(); it != docsOrdenados.rend(); it++){
         if ( i < numDocumentos && i < NumeroDocumentosPorPregunta)
-            file << (*it).numPregunta << " " << (this->formSimilitud==0?"DFR":"BM25") << " " << nombreFicheroPuro[(*it).idDoc - 1] << " " 
+            res << (*it).numPregunta << " " << (this->formSimilitud==0?"DFR":"BM25") << " " << nombreFicheroPuro[(*it).idDoc - 1] << " " 
             << i << " " << (*it).vSimilitud << " " << ((((*it).numPregunta)==0)?pregunta:"ConjuntoDePreguntas") << "\n";
         i++;
         if(i == NumeroDocumentosPorPregunta)
             i = 0;
     }
+    file << res.str();
     file.close();
     return true;
 }

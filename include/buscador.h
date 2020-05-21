@@ -3,7 +3,7 @@
 #include "indexadorHash.h"
 #include <queue>
 #include <set>
-#include <map>
+#include <algorithm>
 #include <math.h>
 
 class ResultadoRI {
