@@ -176,7 +176,7 @@ void Buscador::ImprimirResultadoBusqueda(const int& numDocumentos) const{
 
 bool Buscador::ImprimirResultadoBusqueda(const int& numDocumentos, const string& nomFichero) const{
     ofstream file;
-    file.open(nomFichero.c_str());
+    file.open(nomFichero);
     if(!file){
         cerr << "ERROR: No se pudo abrir el archivo nomFichero" << endl;
         return false;
