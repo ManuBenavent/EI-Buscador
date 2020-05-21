@@ -21,7 +21,7 @@ int main() {
     b.Indexar("ficherosTimes.txt");
     b.GuardarIndexacion();
     // Creo el buscador
-    Buscador a("./indicePruebaEspanyol", 1);
+    Buscador a("./indicePruebaEspanyol", 0);
     // Primera consulta
     time_t inicioA, finA;
     time(&inicioA);
