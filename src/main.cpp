@@ -29,7 +29,7 @@ int main() {
 
     a.IndexarPregunta("KENNEDY ADMINISTRATION PRESSURE ON NGO DINH DIEM TO STOP SUPPRESSING THE BUDDHISTS . ");
     a.Buscar(423);
-    a.ImprimirResultadoBusqueda(423, "Resultados/DFR_simple.txt");
+    a.ImprimirResultadoBusqueda(423, "DFR_simple.txt");
 
     double AA = getcputime()-aa;
     cout << "\nHa tardado " << AA << " segundos\n\n";
@@ -39,7 +39,7 @@ int main() {
     double aaB=getcputime();
 
     a.Buscar("./CorpusTime/Preguntas/", 423, 1, 83);
-    a.ImprimirResultadoBusqueda(1, "Resultados/DFR_todo.txt");
+    a.ImprimirResultadoBusqueda(1, "DFR_todo.txt");
     double bbB=getcputime()-aaB;
     cout << "\nHa tardado " << bbB << " segundos\n\n";
     return 0;

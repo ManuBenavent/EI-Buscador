@@ -128,16 +128,17 @@ bool Buscador::BuscarInterno(const int& numDocumentos, const int& numPreg){
             docs[term->first-1] = ResultadoRI(docs[term->first-1].vSimilitud + res, term->first, numPreg);
         }
     }
-
+    /*make_heap(docs.begin(), docs.end());
+    sort_heap(docs.begin(), docs.end());*/
     sort(docs.begin(), docs.end());
     int i = 0;
     for(auto it = docs.rbegin(); it != docs.rend() && i < numDocumentos; it++){
         if((*it).idDoc == -1)
             break;
-        docsOrdenados.insert(*it);
+        docsOrdenados.push_back(*it);
         i++;
     }
-    return docs[0].vSimilitud == 0;
+    return true; // TODO revisar que pasa si docsOrdenados sigue siendo 0
 }
 
 bool Buscador::Buscar(const string& dirPreguntas, const int& numDocumentos, const int& numPregInicio, const int& numPregFin){
@@ -163,7 +164,7 @@ bool Buscador::Buscar(const string& dirPreguntas, const int& numDocumentos, cons
 void Buscador::ImprimirResultadoBusqueda(const int& numDocumentos) const{
     int i = 0;
     stringstream res;
-    for(set<ResultadoRI>::reverse_iterator it = docsOrdenados.rbegin(); it != docsOrdenados.rend(); it++){
+    for(auto it = docsOrdenados.begin(); it != docsOrdenados.end(); it++){
         if ( i < numDocumentos && i < NumeroDocumentosPorPregunta)
             res << (*it).numPregunta << " " << (this->formSimilitud==0?"DFR":"BM25") << " " << nombreFicheroPuro[(*it).idDoc - 1] << " " 
             << i << " " << (*it).vSimilitud << " " << ((((*it).numPregunta)==0)?pregunta:"ConjuntoDePreguntas") << "\n";
@@ -183,7 +184,7 @@ bool Buscador::ImprimirResultadoBusqueda(const int& numDocumentos, const string&
     }
     stringstream res;
     int i = 0;
-    for(set<ResultadoRI>::reverse_iterator it = docsOrdenados.rbegin(); it != docsOrdenados.rend(); it++){
+    for(auto it = docsOrdenados.rbegin(); it != docsOrdenados.rend(); it++){
         if ( i < numDocumentos && i < NumeroDocumentosPorPregunta)
             res << (*it).numPregunta << " " << (this->formSimilitud==0?"DFR":"BM25") << " " << nombreFicheroPuro[(*it).idDoc - 1] << " " 
             << i << " " << (*it).vSimilitud << " " << ((((*it).numPregunta)==0)?pregunta:"ConjuntoDePreguntas") << "\n";
