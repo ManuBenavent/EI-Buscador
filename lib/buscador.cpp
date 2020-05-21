@@ -134,6 +134,8 @@ bool Buscador::BuscarInterno(const int& numDocumentos, const int& numPreg){
                 mapa[term->first] = ResultadoRI(res, term->first, numPreg);
         }
     }
+    if(mapa.size() == 0)
+        return false;
     int i = 0;
     // TODO insertar el ultimo primero es mas eficiente?
     for(auto it = mapa.begin(); it != mapa.end() && i < numDocumentos; it++){
