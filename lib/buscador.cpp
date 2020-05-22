@@ -12,10 +12,10 @@ ResultadoRI::ResultadoRI(const double& kvSimilitud, const long int& kidDoc, cons
 }
 
 bool ResultadoRI::operator< (const ResultadoRI& lhs) const{
-    if(numPregunta == lhs.numPregunta)
+    if(idDoc == lhs.idDoc)
         return vSimilitud < lhs.vSimilitud;
     else
-        return numPregunta > lhs.numPregunta;
+        return idDoc > lhs.idDoc;
 }
 
 ostream& operator<< (ostream& os, const ResultadoRI &res){
@@ -106,10 +106,11 @@ bool Buscador::Buscar(const int& numDocumentos){
     return BuscarInterno(numDocumentos, 0);
 }
 
-bool Buscador::BuscarInterno(const int& numDocumentos, const int& numPreg){
+bool Buscador::BuscarInterno(const int& numDocumentos, const int& numPreg){    
     // Almacena la información de la búsqueda para que sea accesible por id
     set<ResultadoRI> docs;
-    vector<set<ResultadoRI>::iterator> posDocs (indiceDocs.size(), docs.end());
+    pair<bool, set<ResultadoRI>::iterator> par (false, docs.end());
+    vector<pair<bool, set<ResultadoRI>::iterator>> posDocs (indiceDocs.size(), par);
     // Solo recorro los términos 'útiles' de la pregunta indexada
     for(unordered_map<string, InformacionTerminoPregunta>::const_iterator it = indicePregunta.begin(); it != indicePregunta.end(); it++){
         double wtPreg = (double)it->second.get_ft()/infPregunta.getNumTotalPalSinParada();
@@ -127,17 +128,19 @@ bool Buscador::BuscarInterno(const int& numDocumentos, const int& numPreg){
                 res = wtPreg * term->second.PesoDFR();
             else
                 res = (double)it->second.getIDF()*term->second.PesoBM25();
-            if(posDocs[term->first-1] != docs.end()){
-                res += (*posDocs[term->first-1]).vSimilitud;
-                docs.erase(posDocs[term->first-1]);
+
+            if(posDocs[term->first-1].first){
+                res += (*posDocs[term->first-1].second).vSimilitud;
+                docs.erase(posDocs[term->first-1].second);
             }
-            posDocs[term->first-1] = (docs.insert(ResultadoRI(res, term->first, numPreg))).first;
+            posDocs[term->first-1].first = true;
+            posDocs[term->first-1].second = (docs.insert(ResultadoRI(res, term->first, numPreg))).first;
         }
     }
-    while(docs.size() > numDocumentos)
-        docs.erase(docs.begin());
+
+    /*while(docs.size() > numDocumentos)
+        docs.erase(docs.begin());*/
     docsOrdenados.push_back(docs);
-    
     return true; // TODO revisar que pasa si docsOrdenados sigue siendo 0
 }
 
