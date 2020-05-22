@@ -108,23 +108,22 @@ bool Buscador::Buscar(const int& numDocumentos){
 
 bool Buscador::BuscarInterno(const int& numDocumentos, const int& numPreg){
     // Almacena la información de la búsqueda para que sea accesible por id
-    vector<ResultadoRI> docs (indiceDocs.size(), ResultadoRI(0,-1,-1));
+    vector<ResultadoRI> docs (indiceDocs.size(), ResultadoRI(0,1,-1));
     // Solo recorro los términos 'útiles' de la pregunta indexada
     for(unordered_map<string, InformacionTerminoPregunta>::const_iterator it = indicePregunta.begin(); it != indicePregunta.end(); it++){
+        double wtPreg = (double)it->second.get_ft()/infPregunta.getNumTotalPalSinParada();
+        if((formSimilitud && it->second.getIDF() < 1) || (!formSimilitud && wtPreg < 0.1))
+            continue;
         // Obtengo InformacionTermino (si existe) para el termino
         unordered_map<string, InformacionTermino>::const_iterator infIterator = indice.find(it->first);
         if(infIterator == indice.end())
-            continue;
-        double wtPreg;
-        if(!formSimilitud)
-            double wtPreg = (double)it->second.get_ft()/infPregunta.getNumTotalPalSinParada();
+            continue;            
         // Recorro los documentos que contienen ese termino
         unordered_map<long int, InfTermDoc> l_docs = infIterator->second.getMap();
         for(unordered_map<long int, InfTermDoc>::const_iterator term = l_docs.begin(); term != l_docs.end(); term++){
             double res;
             if(!formSimilitud)
-                //res = wtPreg * term->second.PesoDFR(); // TODO optimizar más
-                res = 0;
+                res = wtPreg * term->second.PesoDFR();
             else
                 res = (double)it->second.getIDF()*term->second.PesoBM25();
             
