@@ -138,8 +138,8 @@ bool Buscador::BuscarInterno(const int& numDocumentos, const int& numPreg){
         }
     }
 
-    /*while(docs.size() > numDocumentos)
-        docs.erase(docs.begin());*/
+    while(docs.size() > numDocumentos)
+        docs.erase(docs.begin());
     docsOrdenados.push_back(docs);
     return true; // TODO revisar que pasa si docsOrdenados sigue siendo 0
 }
