@@ -31,7 +31,7 @@ private:
     
     //priority_queue< ResultadoRI > docsOrdenados;
     //set<ResultadoRI> docsOrdenados;
-    vector<vector<ResultadoRI>> docsOrdenados;
+    vector<set<ResultadoRI>> docsOrdenados;
 
     // 0: DFR, 1: BM25
     int formSimilitud;

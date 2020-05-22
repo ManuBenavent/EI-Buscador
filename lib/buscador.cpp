@@ -108,12 +108,13 @@ bool Buscador::Buscar(const int& numDocumentos){
 
 bool Buscador::BuscarInterno(const int& numDocumentos, const int& numPreg){
     // Almacena la información de la búsqueda para que sea accesible por id
-    vector<ResultadoRI> docs (indiceDocs.size(), ResultadoRI(0,1,-1));
+    set<ResultadoRI> docs;
+    vector<set<ResultadoRI>::iterator> posDocs (indiceDocs.size(), docs.end());
     // Solo recorro los términos 'útiles' de la pregunta indexada
     for(unordered_map<string, InformacionTerminoPregunta>::const_iterator it = indicePregunta.begin(); it != indicePregunta.end(); it++){
         double wtPreg = (double)it->second.get_ft()/infPregunta.getNumTotalPalSinParada();
-        if((formSimilitud && it->second.getIDF() < 1) || (!formSimilitud && wtPreg < 0.1))
-            continue;
+        /*if((formSimilitud && it->second.getIDF() < 1) || (!formSimilitud && wtPreg < 0.1))
+            continue;*/
         // Obtengo InformacionTermino (si existe) para el termino
         unordered_map<string, InformacionTermino>::const_iterator infIterator = indice.find(it->first);
         if(infIterator == indice.end())
@@ -122,26 +123,21 @@ bool Buscador::BuscarInterno(const int& numDocumentos, const int& numPreg){
         unordered_map<long int, InfTermDoc> l_docs = infIterator->second.getMap();
         for(unordered_map<long int, InfTermDoc>::const_iterator term = l_docs.begin(); term != l_docs.end(); term++){
             double res;
-            if(!formSimilitud)
+            if(formSimilitud == 0)
                 res = wtPreg * term->second.PesoDFR();
             else
                 res = (double)it->second.getIDF()*term->second.PesoBM25();
-            
-            docs[term->first-1] = ResultadoRI(docs[term->first-1].vSimilitud + res, term->first, numPreg);
+            if(posDocs[term->first-1] != docs.end()){
+                res += (*posDocs[term->first-1]).vSimilitud;
+                docs.erase(posDocs[term->first-1]);
+            }
+            posDocs[term->first-1] = (docs.insert(ResultadoRI(res, term->first, numPreg))).first;
         }
     }
-    /*make_heap(docs.begin(), docs.end());
-    sort_heap(docs.begin(), docs.end());*/
-    sort(docs.begin(), docs.end());
-    docs.resize(numDocumentos); // TODO no cubre todos los casos
+    while(docs.size() > numDocumentos)
+        docs.erase(docs.begin());
     docsOrdenados.push_back(docs);
-    /*int i = 0;
-    for(auto it = docs.rbegin(); it != docs.rend() && i < numDocumentos; it++){
-        if((*it).idDoc == -1)
-            break;
-        docsOrdenados.push_back(*it);
-        i++;
-    }*/
+    
     return true; // TODO revisar que pasa si docsOrdenados sigue siendo 0
 }
 
@@ -170,7 +166,7 @@ void Buscador::ImprimirResultadoBusqueda(const int& numDocumentos) const{
     int i;
     for(auto it = docsOrdenados.begin(); it != docsOrdenados.end(); it++){
         i = 0;
-        for(auto it2 = (*it).begin(); it2 != (*it).end()&& i < numDocumentos; it2++, i++){
+        for(auto it2 = (*it).rbegin(); it2 != (*it).rend()&& i < numDocumentos; it2++, i++){
             res << (*it2).numPregunta << " " << (this->formSimilitud==0?"DFR":"BM25") << " " << nombreFicheroPuro[(*it2).idDoc - 1] << " " 
             << i << " " << (*it2).vSimilitud << " " << ((((*it2).numPregunta)==0)?pregunta:"ConjuntoDePreguntas") << "\n";
         }
@@ -189,7 +185,7 @@ bool Buscador::ImprimirResultadoBusqueda(const int& numDocumentos, const string&
     int i;
     for(auto it = docsOrdenados.begin(); it != docsOrdenados.end(); it++){
         i = 0;
-        for(auto it2 = (*it).begin(); it2 != (*it).end()&& i < numDocumentos; it2++, i++){
+        for(auto it2 = (*it).rbegin(); it2 != (*it).rend()&& i < numDocumentos; it2++, i++){
             res << (*it2).numPregunta << " " << (this->formSimilitud==0?"DFR":"BM25") << " " << nombreFicheroPuro[(*it2).idDoc - 1] << " " 
             << i << " " << (*it2).vSimilitud << " " << ((((*it2).numPregunta)==0)?pregunta:"ConjuntoDePreguntas") << "\n";
         }
