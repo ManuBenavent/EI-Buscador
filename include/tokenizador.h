@@ -5,6 +5,7 @@
 #include <sstream>
 #include <streambuf>
 #include <list>
+#include <deque>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <cstdlib>
@@ -50,7 +51,7 @@ private:
 
     void set_up_newValue();
 
-    void TokenizarInterno(string& , string&) const;
+    void TokenizarInterno(string &str, string& output) const;
 
 public:
     // Constructor
@@ -67,6 +68,8 @@ public:
 
     // Operador asignación
     Tokenizador& operator= (const Tokenizador&);
+
+    void Tokenizar(string, deque<string>&) const;
 
     // Tokeniza str, resultado en tokens
     void Tokenizar(string , list<string>&) const;

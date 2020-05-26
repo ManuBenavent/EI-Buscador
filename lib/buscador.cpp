@@ -138,7 +138,7 @@ bool Buscador::BuscarInterno(const int& numDocumentos, const int& numPreg){
         docsOrdenados.push_back(*it);
         i++;
     }
-    return true; // TODO revisar que pasa si docsOrdenados sigue siendo 0
+    return !docsOrdenados.empty(); // TODO revisar que pasa si docsOrdenados sigue siendo 0
 }
 
 bool Buscador::Buscar(const string& dirPreguntas, const int& numDocumentos, const int& numPregInicio, const int& numPregFin){

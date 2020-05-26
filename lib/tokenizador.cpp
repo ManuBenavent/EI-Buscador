@@ -216,6 +216,23 @@ void Tokenizador::Tokenizar(string str, list<string>& tokens) const{
     }
 }
 
+void Tokenizador::Tokenizar(string str, deque<string>& v)  const{
+    // Corregir acentos y mayusculas si es necesario
+    if(this->pasarAminuscSinAcentos){
+        EliminarMayusAcentos(str);
+    }
+    string::size_type lastPos = FindFirstNoDelimiter(str, 0);
+    string::size_type pos = FindFirstDelimiter(str, lastPos);
+
+    while(lastPos != string::npos){
+        pos = (pos==string::npos?str.length():pos);
+        v.push_back(str.substr(lastPos, pos - lastPos));
+        lastPos = FindFirstNoDelimiter(str, pos);
+        pos = FindFirstDelimiter(str, lastPos);
+    }
+}
+
+
 void Tokenizador::TokenizarInterno(string &str, string& output) const{
     bool initial_zero = false;
         

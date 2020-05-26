@@ -185,6 +185,7 @@ bool IndexadorHash::Indexar(const string& ficheroDocumentos){
     iDocuments.close();
     if(almacenarEnDisco)
         DesfragmentarArchivos();
+    return true;
 }
 
 void IndexadorHash::DesfragmentarArchivos(){
@@ -688,13 +689,12 @@ bool IndexadorHash::IndexarPregunta(const string& preg){
     pregunta = preg;
     indicePregunta.clear();
     infPregunta = InformacionPregunta();
-
-    list<string> tokens;
+    //list<string> tokens;
+    //string tokens;
+    deque<string> tokens;
     stemmerPorter stemmer;
-    try{
-        tok.Tokenizar(preg, tokens);
-    
-    for(list<string>::iterator it = tokens.begin(); it != tokens.end(); it++){
+    tok.Tokenizar(preg, tokens);
+    for(deque<string>::iterator it = tokens.begin(); it != tokens.end(); it++){
         infPregunta.addPal();
         if(stopWords.find(*it) == stopWords.end()){
             stemmer.stemmer(*it, tipoStemmer);
@@ -727,7 +727,6 @@ bool IndexadorHash::IndexarPregunta(const string& preg){
             }
         }
     }
-    }catch(bad_alloc){ cerr << "ERROR: Memoria insuficiente." << endl; return false; }
     if(indicePregunta.empty()){
         cerr << "ERROR: No se ha indexado ningun termino." << endl;
         return false;
