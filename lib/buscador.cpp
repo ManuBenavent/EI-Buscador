@@ -192,7 +192,7 @@ bool Buscador::ImprimirResultadoBusqueda(const int& numDocumentos, const string&
     }
     stringstream res;
     int i = 0;
-    for(auto it = docsOrdenados.rbegin(); it != docsOrdenados.rend(); it++){
+    for(auto it = docsOrdenados.begin(); it != docsOrdenados.end(); it++){
         if ( i < numDocumentos)
             res << (*it).numPregunta << " " << (this->formSimilitud==0?"DFR":"BM25") << " " << nombreFicheroPuro[(*it).idDoc - 1] << " " 
             << i << " " << (*it).vSimilitud << " " << ((((*it).numPregunta)==0)?pregunta:"ConjuntoDePreguntas") << "\n";

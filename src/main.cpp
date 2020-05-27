@@ -17,13 +17,13 @@ double getcputime(void) {
 
 int main() {
     // Indexacion
-    IndexadorHash b("./StopWordsEspanyol.txt", ". ,:", false, false, "./indicePruebaEspanyol", 0, false, false);
+    IndexadorHash b("./StopWordsEspanyol.txt", ". ,:", false, true, "./indicePruebaEspanyol", 0, false, false);
     b.Indexar("ficherosTimes.txt");
     b.GuardarIndexacion();
     // Creo el buscador
-    Buscador a("./indicePruebaEspanyol", 1);
+    Buscador a("./indicePruebaEspanyol", 0);
     // Primera consulta
-    time_t inicioA, finA;
+    /*time_t inicioA, finA;
     time(&inicioA);
     double aa = getcputime();
 
@@ -36,11 +36,14 @@ int main() {
     
     time_t inicioB, finB;
     time(&inicioB);
-    double aaB=getcputime();
+    double aaB=getcputime();*/
 
     a.Buscar("./CorpusTime/Preguntas/", 423, 1, 83);
-    a.ImprimirResultadoBusqueda(1, "DFR_todo.txt");
-    double bbB=getcputime()-aaB;
-    cout << "\nHa tardado " << bbB << " segundos\n\n";
+    a.ImprimirResultadoBusqueda(423, "fich_salida_buscador_alumno_DFR_Stemming.txt");
+    a.CambiarFormulaSimilitud(1);
+    a.Buscar("./CorpusTime/Preguntas/", 423, 1, 83);
+    a.ImprimirResultadoBusqueda(423, "fich_salida_buscador_alumno_BM25_Stemming.txt");
+    /*double bbB=getcputime()-aaB;
+    cout << "\nHa tardado " << bbB << " segundos\n\n";*/
     return 0;
 }
