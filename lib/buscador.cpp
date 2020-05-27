@@ -110,26 +110,34 @@ bool Buscador::BuscarInterno(const int& numDocumentos, const int& numPreg){
     // Almacena la información de la búsqueda para que sea accesible por id
     vector<ResultadoRI> docs (indiceDocs.size(), ResultadoRI(0,-1,-1));
     // Solo recorro los términos 'útiles' de la pregunta indexada
-    for(unordered_map<string, InformacionTerminoPregunta>::const_iterator it = indicePregunta.begin(); it != indicePregunta.end(); it++){
-        // Obtengo InformacionTermino (si existe) para el termino
-        unordered_map<string, InformacionTermino>::const_iterator infIterator = indice.find(it->first);
-        if(infIterator == indice.end())
-            continue;
-
-        // Recorro los documentos que contienen ese termino
-        unordered_map<long int, InfTermDoc> l_docs = infIterator->second.getMap();
-        for(unordered_map<long int, InfTermDoc>::const_iterator term = l_docs.begin(); term != l_docs.end(); term++){
-            double res;
-            if(formSimilitud == 0)
-                res = ((double)it->second.get_ft()/(double)infPregunta.getNumTotalPalSinParada()) * term->second.PesoDFR(); // TODO optimizar más
-            else
-                res = (double)it->second.getIDF()*term->second.PesoBM25();
-            
-            docs[term->first-1] = ResultadoRI(docs[term->first-1].vSimilitud + res, term->first, numPreg);
+    if(formSimilitud)
+        for(unordered_map<string, InformacionTerminoPregunta>::const_iterator it = indicePregunta.begin(); it != indicePregunta.end(); it++){
+            // Obtengo InformacionTermino (si existe) para el termino
+            unordered_map<string, InformacionTermino>::const_iterator infIterator = indice.find(it->first);
+            if(infIterator == indice.end())
+                continue;
+            // Recorro los documentos que contienen ese termino
+            unordered_map<long int, InfTermDoc> l_docs = infIterator->second.getMap();
+            for(unordered_map<long int, InfTermDoc>::const_iterator term = l_docs.begin(); term != l_docs.end(); term++){
+                double res = (double)it->second.getIDF()*term->second.PesoBM25();
+                docs[term->first-1] = ResultadoRI(docs[term->first-1].vSimilitud + res, term->first, numPreg);
+            }
         }
-    }
-    /*make_heap(docs.begin(), docs.end());
-    sort_heap(docs.begin(), docs.end());*/
+    else
+        for(unordered_map<string, InformacionTerminoPregunta>::const_iterator it = indicePregunta.begin(); it != indicePregunta.end(); it++){
+            // Obtengo InformacionTermino (si existe) para el termino
+            unordered_map<string, InformacionTermino>::const_iterator infIterator = indice.find(it->first);
+            if(infIterator == indice.end())
+                continue;
+            double preg_mult = ((double)it->second.get_ft()/(double)infPregunta.getNumTotalPalSinParada());
+            // Recorro los documentos que contienen ese termino
+            unordered_map<long int, InfTermDoc> l_docs = infIterator->second.getMap();
+            for(unordered_map<long int, InfTermDoc>::const_iterator term = l_docs.begin(); term != l_docs.end(); term++){
+                double res =  preg_mult * term->second.PesoDFR();            
+                docs[term->first-1] = ResultadoRI(docs[term->first-1].vSimilitud + res, term->first, numPreg);
+            }
+        }
+
     sort(docs.begin(), docs.end());
     int i = 0;
     for(auto it = docs.rbegin(); it != docs.rend() && i < numDocumentos; it++){
@@ -138,7 +146,7 @@ bool Buscador::BuscarInterno(const int& numDocumentos, const int& numPreg){
         docsOrdenados.push_back(*it);
         i++;
     }
-    return !docsOrdenados.empty(); // TODO revisar que pasa si docsOrdenados sigue siendo 0
+    return !docsOrdenados.empty();
 }
 
 bool Buscador::Buscar(const string& dirPreguntas, const int& numDocumentos, const int& numPregInicio, const int& numPregFin){

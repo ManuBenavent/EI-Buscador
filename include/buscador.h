@@ -72,10 +72,8 @@ public:
 
     Buscador& operator=(const Buscador&);
 
-    // TODO
     bool Buscar(const int& numDocumentos = 99999);
 
-    // TODO
     bool Buscar(const string& dirPreguntas, const int& numDocumentos, const int& numPregInicio, const int& numPregFin);
 
     void ImprimirResultadoBusqueda(const int& numDocumentos = 99999) const;
