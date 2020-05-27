@@ -134,7 +134,7 @@ bool Buscador::BuscarInterno(const int& numDocumentos, const int& numPreg){
             unordered_map<long int, InfTermDoc> l_docs = infIterator->second.getMap();
             for(unordered_map<long int, InfTermDoc>::const_iterator term = l_docs.begin(); term != l_docs.end(); term++){
                 double res =  preg_mult * term->second.PesoDFR();            
-                docs[term->first-1] = ResultadoRI(docs[term->first-1].vSimilitud + res, term->first, numPreg);
+                docs[term->first-1] = ResultadoRI(docs[term->first-1].vSimilitud + preg_mult * term->second.PesoDFR(), term->first, numPreg);
             }
         }
 
