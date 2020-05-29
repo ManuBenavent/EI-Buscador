@@ -50,7 +50,11 @@ Tokenizador::Tokenizador (const string& delimitadoresPalabra, const bool& kcasos
         if(value<0){
             value += 256;
         }
-        if(!stop[value]){
+        if(value == 191)
+            stop[191] = true;
+        else if(value == 161)
+            stop[161] = true;
+        else if(!stop[value]){
             this->delimiters += delimitadoresPalabra[i];
             stop[value] = true;
         }
