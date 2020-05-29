@@ -16,8 +16,8 @@ double getcputime(void) {
 }
 
 int main() {
-    // Indexacion,;:.-/+*\\ '\"{}[]()<>¡!¿?&#=\t\n\r@
-    IndexadorHash b("./StopWordsIngles.txt", ",;:.-/+*\\ '\"{}[]()<>¡!¿?&#=\t\n\r@", false, true, "./indicePruebaEspanyol", 2, false, false);
+    // Indexacion,;:.-/+*\\ '\"{}[]()<>?!??&#=\t\n\r@
+    IndexadorHash b("./StopWordsIngles.txt", ",;:.-/+*\\ '\"{}[]()<>?!??&#=\t\n\r@", false, true, "./indicePruebaEspanyol", 2, false, false);
     b.Indexar("ficherosTimes.txt");
     b.GuardarIndexacion();
     // Creo el buscador

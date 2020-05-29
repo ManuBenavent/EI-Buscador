@@ -29,9 +29,9 @@ class Buscador: public IndexadorHash {
 private:
     Buscador();
     
-    //priority_queue< ResultadoRI > docsOrdenados;
-    //set<ResultadoRI> docsOrdenados;
-    //vector<ResultadoRI> docsOrdenados;
+    /*priority_queue< ResultadoRI > docsOrdenados3;
+    set<ResultadoRI> docsOrdenados2;
+    vector<ResultadoRI> docsOrdenados1;*/
     deque<ResultadoRI> docsOrdenados;
 
     // 0: DFR, 1: BM25

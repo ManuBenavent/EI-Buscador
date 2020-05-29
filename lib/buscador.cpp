@@ -141,9 +141,8 @@ bool Buscador::BuscarInterno(const int& numDocumentos, const int& numPreg){
     sort(docs.begin(), docs.end());
     int i = 0;
     for(auto it = docs.rbegin(); it != docs.rend() && i < numDocumentos; it++){
-        if((*it).idDoc == -1)
-            break;
-        docsOrdenados.push_back(*it);
+        if((*it).idDoc != -1)
+            docsOrdenados.push_back(*it);
         i++;
     }
     return !docsOrdenados.empty();
